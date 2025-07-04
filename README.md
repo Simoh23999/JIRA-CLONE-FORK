@@ -8,8 +8,7 @@ hna ghatl9aw 2 methodes kifach tkono a jour bl2ijabiyat w silbiyat dyalhom :
 
 ```bash
 git checkout feature/test-feature
-git fetch origin
-git merge origin/main
+git pull origin main
 ```
 
 

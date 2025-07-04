@@ -1,0 +1,74 @@
+name: "Backend Issue"
+description: gol lina chi mochkil l9itih  flbackend
+title: "[BACKEND] <your title here>"
+labels: [backend bug]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Backend Issue Template
+        gol lina l mochkil li l9iti flbackend en details
+
+  - type: input
+    id: module
+    attributes:
+      label: l Module/Service li fih lmochkil
+      description: achmn  partie li fiha lmochkil  (Auth, API, models, ...)?
+      placeholder: b7al AuthController mataln
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: chr7 lmochkil
+      description: 3ti description 3la lmochkil.
+      placeholder: chno kayn w chno katw93 khaas ikon
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 3tina steps bach kayo93 lbug
+      placeholder: |
+        1. lancer lbackend
+        2. POST /api/login
+        3. kay3ti erreur
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: chno homa logs dyal lmmochkil.
+    validations:
+      required: false
+
+  - type: input
+    id: spring-version
+    attributes:
+      label: Spring Boot Version
+      description: achmn version dyal Spring Boot bach khdam?
+      placeholder: mmatalan 3.2.1
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: had lmoochkil 3mro t7l mn 9bl
+      options:
+        - label: oui
+        - label: non
+        
+  - type: checkboxes
+    id: checklist2
+    attributes:
+      label: wach ghadi tkhdm 3liha ?
+      options:
+        - label: oui
+        - label: non

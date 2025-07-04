@@ -1,0 +1,83 @@
+name: "Frontend Issue"
+description: gol lina chi mochkil l9itih fl frontend
+title: "[FRONTEND] <titre 3la lmochkil>"
+labels: [frontend bug]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Frontend Issue Template
+        gol lina l mochkil li l9iti flbackend en details
+
+  - type: input
+    id: page
+    attributes:
+      label: l Page/Component li fih lmochkil
+      description: achmnm page wla component li fih lmochkil?
+      placeholder: matalaan LoginPage, NavBar ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: chr7 lmochkil
+      description: 3ti chi description 3la lmochkil.
+      placeholder: chno kayn w chno katw93 khaas ikon
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 3tina steps bach kayo93 lbug
+      placeholder: |
+        1. sir l /login
+        2. dkhl chi 7aja  ghalat
+        3. makayo93 walo (khas iban erreur)
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 3tina Screenshots
+      placeholder: Drag and drop images
+    validations:
+      required: false
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser o Device fach kayn lmochkil
+      description: 3tina smiya dyal lbrowser, version ila kan momkin, o device.
+      placeholder: b7al Chrome f android
+    validations:
+      required: true
+
+  - type: input
+    id: next-version
+    attributes:
+      label: Next.js Version
+      description: achmn version dyal next.js bach khdam?
+      placeholder: matalan 14.0.3
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: had lmoochkil 3mro t7l mn 9bl
+      options:
+        - label: oui
+        - label: non
+        
+  - type: checkboxes
+    id: checklist2
+    attributes:
+      label: wach ghadi tkhdm 3liha ?
+      options:
+        - label: oui
+        - label: non

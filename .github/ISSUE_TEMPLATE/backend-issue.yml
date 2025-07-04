@@ -55,7 +55,7 @@ body:
       description: achmn version dyal Spring Boot bach khdam?
       placeholder: mmatalan 3.2.1
     validations:
-      required: true
+      required: false
 
   - type: checkboxes
     id: checklist

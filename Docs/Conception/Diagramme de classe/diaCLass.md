@@ -1,0 +1,1 @@
+![alt text](<diaCLass.svg>)

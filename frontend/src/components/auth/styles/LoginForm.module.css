@@ -1,0 +1,19 @@
+.border_inputField_blue:focus {
+  box-shadow: 0 0 0 0.08em #5f81c7;
+}
+
+.text_login_blue {
+  color: #527fc1;
+}
+
+.text_login_blue:hover {
+  color: #3b5f8c;
+}
+
+.bg_loginButton_blue {
+  background-color: #527fc1;
+}
+
+.bg_loginButton_blue:hover {
+  background-color: #3b5f8c;
+}

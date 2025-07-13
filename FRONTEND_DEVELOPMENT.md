@@ -15,11 +15,7 @@ cd frontend
 ```bash
 npm install
 ```
-3. Initialiser Husky après le premier "npm install" (darori) :
 
-```bash
-npx husky init
-```
 <br>
 
 # Démarrer le projet en local
@@ -65,9 +61,6 @@ npm run pre-commit
 # Pre-commit Hook
 L'orsque vous fait une commit avec `git commit`, les fichiers modifiés passent automatiquement par : **ESLint** *--fix* et **Prettier** *--write*, c-a-d que les erreurs de syntaxe de ton code vont etre **corriger automatiquement** et **reformater** indenté et suprimer tout espace inutile (les tabulation, espace vide, ...)
 
->[!WARNING]
-n'oublie pas d'executer la commande
-d'activation `npx husky init` après la 1ere "npm install"
 
 <br>
 

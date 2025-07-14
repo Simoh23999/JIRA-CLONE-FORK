@@ -13,6 +13,10 @@ type LoginFormProps = {
   password: string;
   rememberMe: boolean;
   showPassword: boolean;
+  errors: {
+    email?: string;
+    password?: string;
+  };
   onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRememberMeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -20,6 +24,8 @@ type LoginFormProps = {
   onSubmit: (e: React.FormEvent) => void;
   onGoogleLogin?: () => void;
   onForgotPassword?: () => void;
+  onEmailBlur: () => void;
+  onPasswordBlur: () => void;
 };
 
 export default function LoginForm({
@@ -27,33 +33,42 @@ export default function LoginForm({
   password,
   rememberMe,
   showPassword,
+  errors,
   onEmailChange,
   onPasswordChange,
   onRememberMeChange,
   onTogglePassword,
   onSubmit,
   onForgotPassword,
+  onEmailBlur,
+  onPasswordBlur
 }: LoginFormProps) {
   return (
     <form className="space-y-6" onSubmit={onSubmit}>
       {/* Email input */}
       <InputField
         type="email"
+        name="email"
         placeholder="E-mail"
         value={email}
         onChange={onEmailChange}
         style={styles.border_inputField_blue}
         Icon={Mail}
+        error={errors.email}
+        onInputBlur={onEmailBlur}
       ></InputField>
 
       {/* Password input */}
       <PasswordField
+        name="password"
         placeholder="Mot de passe"
         value={password}
+        onPasswordBlur={onPasswordBlur}
         style={styles.border_inputField_blue}
         onChange={onPasswordChange}
         showPassword={showPassword}
         onTogglePassword={onTogglePassword}
+        error={errors.password}
       />
 
       {/* remember me & forgot password */}

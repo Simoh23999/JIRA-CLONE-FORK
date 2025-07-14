@@ -12,6 +12,12 @@ type SignupFormProps = {
   confirmPassword: string;
   showPassword: boolean;
   showConfirmPassword: boolean;
+  errors: {
+    fullName?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  };
   onFullNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -19,6 +25,10 @@ type SignupFormProps = {
   onTogglePassword: () => void;
   onToggleConfirmPassword: () => void;
   onSubmit: (e: React.FormEvent) => void;
+  onFullNameBlur: () => void;
+  onEmailBlur: () => void;
+  onPasswordBlur: () => void;
+  onConfirmPasswordBlur: () => void;
 };
 
 export default function SignupForm({
@@ -28,6 +38,7 @@ export default function SignupForm({
   confirmPassword,
   showPassword,
   showConfirmPassword,
+  errors,
   onFullNameChange,
   onEmailChange,
   onPasswordChange,
@@ -35,6 +46,10 @@ export default function SignupForm({
   onTogglePassword,
   onToggleConfirmPassword,
   onSubmit,
+  onFullNameBlur,
+  onEmailBlur,
+  onPasswordBlur,
+  onConfirmPasswordBlur
 }: SignupFormProps) {
   return (
     <form className="space-y-6" onSubmit={onSubmit}>
@@ -46,6 +61,8 @@ export default function SignupForm({
         onChange={onFullNameChange}
         style={styles.border_inputField_blue}
         Icon={User}
+        error={errors.fullName}
+        onInputBlur={onFullNameBlur}
       ></InputField>
 
       {/* email input */}    
@@ -56,6 +73,8 @@ export default function SignupForm({
         onChange={onEmailChange}
         style={styles.border_inputField_blue}
         Icon={Mail}
+        error={errors.email}
+        onInputBlur={onEmailBlur}
       ></InputField>
       {/* password input */}
       <div>
@@ -65,7 +84,9 @@ export default function SignupForm({
           style={styles.border_inputField_blue}
           onChange={onPasswordChange}
           showPassword={showPassword}
+          error={errors.password}
           onTogglePassword={onTogglePassword}
+          onPasswordBlur={onPasswordBlur}
         ></PasswordField>
       </div>
 
@@ -74,10 +95,13 @@ export default function SignupForm({
         <PasswordField
           placeholder="Confirmer le mot de passe"
           value={confirmPassword}
+          error={errors.confirmPassword}
           style={styles.border_inputField_blue}
           onChange={onConfirmPasswordChange}
           showPassword={showConfirmPassword}
           onTogglePassword={onToggleConfirmPassword}
+          onPasswordBlur={onConfirmPasswordBlur}
+
         ></PasswordField>
       </div>
 

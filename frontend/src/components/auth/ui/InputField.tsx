@@ -7,6 +7,9 @@ type InputFieldProps = {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   Icon: LucideIcon;
   style: string;
+  error?: string;
+  name?: string;
+  onInputBlur: () => void;
 };
 
 export default function InputField({
@@ -16,17 +19,33 @@ export default function InputField({
   onChange,
   Icon,
   style,
+  error,
+  name,
+  onInputBlur
 }: InputFieldProps) {
+  const borderStyle = error 
+  ? "border-red-500 focus:border-red-500 focus:ring-red-500" 
+  : style;
+
   return (
+    <div className="space-y-1">
     <div className="relative">
-      <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+      <Icon className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
+              error ? 'text-red-500' : 'text-gray-400'
+            }`} />
       <input
         type={type}
+        name={name}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className={`w-full pl-12 pr-4 py-4 border ${style} border-gray-200 rounded-lg focus:outline-none border-inputField-blue text-gray-900 placeholder-gray-500`}
+        onBlur={onInputBlur}
+        className={`w-full px-4 py-3 pl-12 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-colors ${borderStyle} placeholder-gray-500 text-gray-900`}
       />
+    </div>
+          {error && (
+        <p className="text-red-500 text-sm mt-1 ml-1">{error}</p>
+      )}
     </div>
   );
 }

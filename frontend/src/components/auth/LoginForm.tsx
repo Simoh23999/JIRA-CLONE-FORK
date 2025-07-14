@@ -41,7 +41,7 @@ export default function LoginForm({
   onSubmit,
   onForgotPassword,
   onEmailBlur,
-  onPasswordBlur
+  onPasswordBlur,
 }: LoginFormProps) {
   return (
     <form className="space-y-6" onSubmit={onSubmit}>

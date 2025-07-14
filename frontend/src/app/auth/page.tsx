@@ -19,12 +19,11 @@ export default function AuthPage() {
   const [fullName, setFullName] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
-
   const [loginErrors, setLoginErrors] = useState<{
     email?: string;
     password?: string;
   }>({});
-  
+
   const [signupErrors, setSignupErrors] = useState<{
     fullName?: string;
     email?: string;
@@ -32,50 +31,47 @@ export default function AuthPage() {
     confirmPassword?: string;
   }>({});
 
+  const validateField = (
+    schema: ZodObject<ZodRawShape>,
+    fieldName: string,
+    value: string,
+    setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>,
+  ) => {
+    const partialData = { [fieldName]: value };
+    const partialSchema = schema.pick({ [fieldName]: true as const });
 
-const validateField = (
-  schema: ZodObject<ZodRawShape>,
-  fieldName: string,
-  value: string,
-  setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>
-) => {
-  const partialData = { [fieldName]: value };
-  const partialSchema = schema.pick({ [fieldName]: true as const });
+    const result = partialSchema.safeParse(partialData);
 
-  const result = partialSchema.safeParse(partialData);
-
-  setErrors((prev) => {
-    const newErrors = { ...prev };
-    if (!result.success) {
-      newErrors[fieldName] = result.error.issues[0].message;
-    } else {
-      delete newErrors[fieldName];
-    }
-    return newErrors;
-  });
-};
-
-
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (!result.success) {
+        newErrors[fieldName] = result.error.issues[0].message;
+      } else {
+        delete newErrors[fieldName];
+      }
+      return newErrors;
+    });
+  };
 
   const LoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoginErrors({});
-const result = loginSchema.safeParse({ email, password });
+    const result = loginSchema.safeParse({ email, password });
 
-  if (!result.success) {
-    const formatted: Record<string, string> = {};
-    result.error.issues.forEach(issue => {
-      formatted[issue.path[0] as string] = issue.message;
-    });
-    setLoginErrors(formatted);
-    return;
-  }
-  console.log("login:", { email, password, rememberMe });
+    if (!result.success) {
+      const formatted: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        formatted[issue.path[0] as string] = issue.message;
+      });
+      setLoginErrors(formatted);
+      return;
+    }
+    console.log("login:", { email, password, rememberMe });
   };
 
   const SignupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSignupErrors({}); 
+    setSignupErrors({});
 
     const result = signupSchema.safeParse({
       fullName,
@@ -86,7 +82,7 @@ const result = loginSchema.safeParse({ email, password });
 
     if (!result.success) {
       const formatted: Record<string, string> = {};
-      result.error.issues.forEach(issue => {
+      result.error.issues.forEach((issue) => {
         formatted[issue.path[0] as string] = issue.message;
       });
       setSignupErrors(formatted);
@@ -128,8 +124,12 @@ const result = loginSchema.safeParse({ email, password });
             onSubmit={LoginSubmit}
             onGoogleLogin={GoogleLogin}
             onForgotPassword={ForgotPassword}
-            onEmailBlur={() => validateField(loginSchema, "email", email, setLoginErrors)}
-            onPasswordBlur={() => validateField(loginSchema, "password", password, setLoginErrors)}
+            onEmailBlur={() =>
+              validateField(loginSchema, "email", email, setLoginErrors)
+            }
+            onPasswordBlur={() =>
+              validateField(loginSchema, "password", password, setLoginErrors)
+            }
           />
         ) : (
           <SignupForm
@@ -148,25 +148,37 @@ const result = loginSchema.safeParse({ email, password });
             onToggleConfirmPassword={() =>
               setShowConfirmPassword(!showConfirmPassword)
             }
-
-            onFullNameBlur={() => validateField(signupSchema, "fullName", fullName, setSignupErrors)}
-            onEmailBlur={() => validateField(signupSchema, "email", email, setSignupErrors)}
-            onPasswordBlur={() => validateField(signupSchema, "password", password, setSignupErrors)}
+            onFullNameBlur={() =>
+              validateField(signupSchema, "fullName", fullName, setSignupErrors)
+            }
+            onEmailBlur={() =>
+              validateField(signupSchema, "email", email, setSignupErrors)
+            }
+            onPasswordBlur={() =>
+              validateField(signupSchema, "password", password, setSignupErrors)
+            }
             onConfirmPasswordBlur={() => {
-    // Pour onConfirmPasswordBlur on fait validation globale
-    const result = signupSchema.safeParse({ fullName, email, password, confirmPassword });
-    setSignupErrors((prev) => {
-      const updated = { ...prev };
-      if (!result.success) {
-        const issue = result.error.issues.find((i) => i.path[0] === "confirmPassword");
-        if (issue) updated.confirmPassword = issue.message;
-        else delete updated.confirmPassword;
-      } else {
-        delete updated.confirmPassword;
-      }
-      return updated;
-    });
-  }}
+              // Pour onConfirmPasswordBlur on fait validation globale
+              const result = signupSchema.safeParse({
+                fullName,
+                email,
+                password,
+                confirmPassword,
+              });
+              setSignupErrors((prev) => {
+                const updated = { ...prev };
+                if (!result.success) {
+                  const issue = result.error.issues.find(
+                    (i) => i.path[0] === "confirmPassword",
+                  );
+                  if (issue) updated.confirmPassword = issue.message;
+                  else delete updated.confirmPassword;
+                } else {
+                  delete updated.confirmPassword;
+                }
+                return updated;
+              });
+            }}
             onSubmit={SignupSubmit}
           />
         )}

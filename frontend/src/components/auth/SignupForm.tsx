@@ -49,7 +49,7 @@ export default function SignupForm({
   onFullNameBlur,
   onEmailBlur,
   onPasswordBlur,
-  onConfirmPasswordBlur
+  onConfirmPasswordBlur,
 }: SignupFormProps) {
   return (
     <form className="space-y-6" onSubmit={onSubmit}>
@@ -65,7 +65,7 @@ export default function SignupForm({
         onInputBlur={onFullNameBlur}
       ></InputField>
 
-      {/* email input */}    
+      {/* email input */}
       <InputField
         type="email"
         placeholder="E-mail"
@@ -101,7 +101,6 @@ export default function SignupForm({
           showPassword={showConfirmPassword}
           onTogglePassword={onToggleConfirmPassword}
           onPasswordBlur={onConfirmPasswordBlur}
-
         ></PasswordField>
       </div>
 

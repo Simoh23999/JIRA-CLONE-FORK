@@ -17,7 +17,6 @@ export default function AuthContainer({ children }: AuthContainerProps) {
         <div className="max-w-6xl w-full flex flex-col lg:flex-row items-center gap-0 lg:gap-20 h-full lg:h-auto">
           {/* left side */}
 
-          
           <div className="flex-1 text-center lg:text-left px-4 lg:px-0 pt-8 pb-4 lg:py-0">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
               Connectez-vous à<br />

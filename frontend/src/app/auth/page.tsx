@@ -31,21 +31,22 @@ export default function AuthPage() {
   const [checking, setChecking] = useState(true);
   const router = useRouter();
 
-  // ✅ Vérification token comme dans le 1er code
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      router.push("/dashboard");
-    } else {
-      setChecking(false);
-    }
-  }, [router]);
+  
+  // useEffect(() => {
+  // localStorage.setItem("token", "abc123");
+  //   const token = localStorage.getItem("token");
+  //   if (token) {
+  //     router.push("/dashboard");
+  //   } else {
+  //     setChecking(false);
+  //   }
+  // }, [router]);
+  
 
-  if (checking) {
-    return <RequireAuth> </RequireAuth>; // Ou un loader si tu veux afficher un truc pendant la vérification
-  }
+  // if (checking) {
+  //   return <RequireAuth> </RequireAuth>;
+  // }
 
-  // ✅ Fonction commune de validation de champ (2e code)
   const validateField = (
     schema: ZodObject<ZodRawShape>,
     fieldName: string,
@@ -66,7 +67,7 @@ export default function AuthPage() {
     });
   };
 
-  // ✅ Soumission Login
+
   const LoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoginErrors({});
@@ -80,10 +81,17 @@ export default function AuthPage() {
       setLoginErrors(formatted);
       return;
     }
+      localStorage.setItem("token", "abc123");
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/dashboard");
+    } else {
+      setChecking(false);
+    }
     console.log("Login:", { email, password, rememberMe });
   };
 
-  // ✅ Soumission Signup
+ 
   const SignupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSignupErrors({});

@@ -1,9 +1,9 @@
 import React from "react";
-import GoogleButton from "../../components/auth/ui/SocialButton";
-import InputField from "../../components/auth/ui/InputField";
-import PasswordField from "../../components/auth/ui/PasswordField";
-import FormDivider from "../../components/auth/ui/FormDivider";
-import AuthButton from "../../components/auth/ui/AuthButton";
+import GoogleButton from "@/components/auth/ui/SocialButton";
+import InputField from "@/components/auth/ui/InputField";
+import PasswordField from "@/components/auth/ui/PasswordField";
+import FormDivider from "@/components/auth/ui/FormDivider";
+import AuthButton from "@/components/auth/ui/AuthButton";
 import styles from "./styles/LoginForm.module.css";
 
 import { Mail } from "lucide-react";

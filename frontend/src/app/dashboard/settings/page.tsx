@@ -1,4 +1,4 @@
 export default async function TasksPage() {
-  await new Promise((resolve) => setTimeout(resolve, 1500))
+  await new Promise((resolve) => setTimeout(resolve, 1500));
   return <h1 className="text-xl font-semibold">Welcome to settings</h1>;
 }

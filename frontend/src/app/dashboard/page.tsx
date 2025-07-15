@@ -17,7 +17,7 @@ export default function DashboardPage() {
   return (
     <div>
       <RequireAuth>
-      <h1 className="text-xl font-semibold">Welcome to the Dashboard</h1>
+        <h1 className="text-xl font-semibold">Welcome to the Dashboard</h1>
       </RequireAuth>
     </div>
   );

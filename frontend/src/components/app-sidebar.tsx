@@ -44,8 +44,10 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   React.useEffect(() => {
     try {
       const token = localStorage.getItem("token");
-      if(!token) {
-        console.warn("Aucun token trouvé, redirection vers la page de connexion");
+      if (!token) {
+        console.warn(
+          "Aucun token trouvé, redirection vers la page de connexion",
+        );
         router.push("/auth");
         return;
       }
@@ -77,13 +79,23 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     ],
     navMain: [
       { title: "Home", url: "/", icon: Home, isActive: false, items: [] },
-      { title: "My Tasks", url: "/tasks", icon: CheckCircle, isActive: false, items: [] },
-      { title: "Members", url: "/members", icon: Users, isActive: false, items: [] },
+      {
+        title: "My Tasks",
+        url: "/tasks",
+        icon: CheckCircle,
+        isActive: false,
+        items: [],
+      },
+      {
+        title: "Members",
+        url: "/members",
+        icon: Users,
+        isActive: false,
+        items: [],
+      },
       { title: "Settings", url: "/settings", icon: Settings2, isActive: false },
     ],
-    projects: [
-      { name: "jira clone", url: "#", icon: Frame },
-    ],
+    projects: [{ name: "jira clone", url: "#", icon: Frame }],
   };
 
   return (

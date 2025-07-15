@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   BadgeCheck,
@@ -6,13 +6,9 @@ import {
   ChevronsUpDown,
   LogOut,
   Sparkles,
-} from "lucide-react"
+} from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,28 +17,28 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
-import { log } from "console"
-import router from "next/router"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
+import { log } from "console";
+import router from "next/router";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    email: string
-    avatar: string
-  }
+    name: string;
+    email: string;
+    avatar: string;
+  };
 }) {
-  const { isMobile } = useSidebar()
-    function Logout() {
+  const { isMobile } = useSidebar();
+  function Logout() {
     // 1. Supprimer les infos de session
     localStorage.removeItem("token");
     // 2. Rediriger manuellement
@@ -60,7 +56,9 @@ export function NavUser({
             >
               <Avatar className="h-10 w-10 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">{user.name[0]} </AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {user.name[0]}{" "}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -79,7 +77,9 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-lg">
                 <Avatar className="h-10 w-10 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">{user.name[0]}</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {user.name[0]}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -88,8 +88,7 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-            </DropdownMenuGroup>
+            <DropdownMenuGroup></DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <Link href="/dashboard/account">
@@ -114,17 +113,17 @@ export function NavUser({
               </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-          
-            <DropdownMenuItem variant="destructive" onClick={() =>Logout()}>
-              {/* Assuming logout is a function that handles user logout */ }
+
+            <DropdownMenuItem variant="destructive" onClick={() => Logout()}>
+              {/* Assuming logout is a function that handles user logout */}
               <Link href="/auth" className="flex items-center">
-              <LogOut className="mr-2 h-4 w-4 text-red-500" />
-              Logout
+                <LogOut className="mr-2 h-4 w-4 text-red-500" />
+                Logout
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

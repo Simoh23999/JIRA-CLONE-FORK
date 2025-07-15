@@ -11,7 +11,9 @@ import { loginSchema, signupSchema } from "./validations/auth";
 import { ZodObject, ZodRawShape } from "zod";
 
 export default function AuthPage() {
-  const [activeTab, setActiveTab] = useState<"connexion" | "inscription">("connexion");
+  const [activeTab, setActiveTab] = useState<"connexion" | "inscription">(
+    "connexion",
+  );
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -20,7 +22,10 @@ export default function AuthPage() {
   const [fullName, setFullName] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
-  const [loginErrors, setLoginErrors] = useState<{ email?: string; password?: string }>({});
+  const [loginErrors, setLoginErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
   const [signupErrors, setSignupErrors] = useState<{
     fullName?: string;
     email?: string;
@@ -31,7 +36,6 @@ export default function AuthPage() {
   const [checking, setChecking] = useState(true);
   const router = useRouter();
 
-  
   // useEffect(() => {
   // localStorage.setItem("token", "abc123");
   //   const token = localStorage.getItem("token");
@@ -41,7 +45,6 @@ export default function AuthPage() {
   //     setChecking(false);
   //   }
   // }, [router]);
-  
 
   // if (checking) {
   //   return <RequireAuth> </RequireAuth>;
@@ -51,7 +54,7 @@ export default function AuthPage() {
     schema: ZodObject<ZodRawShape>,
     fieldName: string,
     value: string,
-    setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>
+    setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>,
   ) => {
     const partialSchema = schema.pick({ [fieldName]: true as const });
     const result = partialSchema.safeParse({ [fieldName]: value });
@@ -67,7 +70,6 @@ export default function AuthPage() {
     });
   };
 
-
   const LoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoginErrors({});
@@ -81,7 +83,7 @@ export default function AuthPage() {
       setLoginErrors(formatted);
       return;
     }
-      localStorage.setItem("token", "abc123");
+    localStorage.setItem("token", "abc123");
     const token = localStorage.getItem("token");
     if (token) {
       router.push("/dashboard");
@@ -91,11 +93,15 @@ export default function AuthPage() {
     console.log("Login:", { email, password, rememberMe });
   };
 
- 
   const SignupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSignupErrors({});
-    const result = signupSchema.safeParse({ fullName, email, password, confirmPassword });
+    const result = signupSchema.safeParse({
+      fullName,
+      email,
+      password,
+      confirmPassword,
+    });
 
     if (!result.success) {
       const formatted: Record<string, string> = {};
@@ -134,8 +140,12 @@ export default function AuthPage() {
             onSubmit={LoginSubmit}
             onGoogleLogin={GoogleLogin}
             onForgotPassword={ForgotPassword}
-            onEmailBlur={() => validateField(loginSchema, "email", email, setLoginErrors)}
-            onPasswordBlur={() => validateField(loginSchema, "password", password, setLoginErrors)}
+            onEmailBlur={() =>
+              validateField(loginSchema, "email", email, setLoginErrors)
+            }
+            onPasswordBlur={() =>
+              validateField(loginSchema, "password", password, setLoginErrors)
+            }
           />
         ) : (
           <SignupForm
@@ -151,7 +161,9 @@ export default function AuthPage() {
             onPasswordChange={(e) => setPassword(e.target.value)}
             onConfirmPasswordChange={(e) => setConfirmPassword(e.target.value)}
             onTogglePassword={() => setShowPassword(!showPassword)}
-            onToggleConfirmPassword={() => setShowConfirmPassword(!showConfirmPassword)}
+            onToggleConfirmPassword={() =>
+              setShowConfirmPassword(!showConfirmPassword)
+            }
             onFullNameBlur={() =>
               validateField(signupSchema, "fullName", fullName, setSignupErrors)
             }
@@ -172,7 +184,7 @@ export default function AuthPage() {
                 const updated = { ...prev };
                 if (!result.success) {
                   const issue = result.error.issues.find(
-                    (i) => i.path[0] === "confirmPassword"
+                    (i) => i.path[0] === "confirmPassword",
                   );
                   if (issue) updated.confirmPassword = issue.message;
                   else delete updated.confirmPassword;

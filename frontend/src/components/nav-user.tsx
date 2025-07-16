@@ -39,10 +39,10 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   function Logout() {
-    // 1. Supprimer les infos de session
+    // Supprimer les infos de session
     localStorage.removeItem("token");
-    // 2. Rediriger manuellement
-    // router.push("/auth");
+    sessionStorage.removeItem("token");
+
   }
 
   return (
@@ -115,7 +115,7 @@ export function NavUser({
             <DropdownMenuSeparator />
 
             <DropdownMenuItem variant="destructive" onClick={() => Logout()}>
-              {/* Assuming logout is a function that handles user logout */}
+              {/* logout is a function that handles user logout */}
               <Link href="/auth" className="flex items-center">
                 <LogOut className="mr-2 h-4 w-4 text-red-500" />
                 Logout

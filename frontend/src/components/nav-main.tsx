@@ -69,7 +69,7 @@ export function NavMain({
                 {hasChildren && (
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {item.items.map((subItem) => (
+                      {item.items!.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
                             <Link href={`/dashboard${subItem.url}`}>

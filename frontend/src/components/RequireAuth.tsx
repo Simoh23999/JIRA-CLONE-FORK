@@ -15,8 +15,9 @@ export default function RequireAuth({ children }: Props) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const token2 = sessionStorage.getItem("token");
 
-    if (!token) {
+    if (!token && !token2) {
       router.push("/auth");
     } else {
       setLoading(false);

@@ -9,7 +9,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
+    const token2 = sessionStorage.getItem("token");
+    if (!token && !token2) {
       router.push("/auth"); // pas connecté → redirection vers auth
     }
   }, [router]);

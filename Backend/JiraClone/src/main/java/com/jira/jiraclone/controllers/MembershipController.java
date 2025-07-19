@@ -1,7 +1,9 @@
 package com.jira.jiraclone.controllers;
 
 import com.jira.jiraclone.dtos.AddMemberRequest;
+import com.jira.jiraclone.dtos.UpdateMemberRoleRequest;
 import com.jira.jiraclone.entities.User;
+import com.jira.jiraclone.entities.enums.RoleInOrganization;
 import com.jira.jiraclone.security.UserPrincipal;
 import com.jira.jiraclone.services.IntrefacesServices.IMembershipService;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +56,29 @@ public class MembershipController {
         Map<String, Object> response = new HashMap<>();
         response.put("status", 200);
         response.put("message", "Membre supprimé avec succès");
+
+        return ResponseEntity.ok().body(response);
+    }
+    //3. route pour mettre à jour le rôle d'un membre dans une organisation
+    @PutMapping("/organizations/{organizationId}/members/{targetUserId}/role")
+    public ResponseEntity<Map<String, Object>> updateMemberRole(
+            @PathVariable Long organizationId,
+            @PathVariable Long targetUserId,
+            @RequestBody UpdateMemberRoleRequest request,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        User requester = userPrincipal.getUser();
+
+        RoleInOrganization newRole = request.getNewRole();
+        if (newRole == null) {
+            throw new IllegalArgumentException("Le rôle est requis.");
+        }
+
+        membershipService.updateMemberRole(organizationId, targetUserId, newRole, requester);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", 200);
+        response.put("message", "Rôle mis à jour avec succès");
 
         return ResponseEntity.ok().body(response);
     }

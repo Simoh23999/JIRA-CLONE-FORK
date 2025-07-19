@@ -134,11 +134,65 @@ public class MembershipServiceImpl implements IMembershipService {
         //9: Supprimer le Membership de l'utilisateur cible
         membershipRepository.deleteByUserAndOrganization(targetUser, organization);
     }
+    /*
+    Les Regles de cette methode updateMemberRole sont les suivantes:
+    0: Vérifier que l'organisation existe.
+    1: Le requester doit être membre de l’organisation.
+    2: Le requester doit avoir le rôle ADMINPROJECT ou OWNER dans l’organisation.
+    3: Vérifier que l'utilisateur cible existe.
+    4: Vérifier que l'utilisateur cible est membre de l'organisation.
+    5: Vérifier que le nouveau rôle est valide.
+    6:Un ADMIN ne peut pas modifier le rôle d’un OWNER
+    7:Un OWNER peut modifier n’importe qui
+    6: Mettre à jour le rôle de l'utilisateur cible dans l'organisation.
 
+     */
     @Override
+
     public void updateMemberRole(Long organizationId, Long targetUserId, RoleInOrganization newRole, User requester) {
 
+        // 1. Vérifier que l’organisation existe
+        var organization = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new NotFoundException("Organisation introuvable."));
+
+        // 2. Vérifier que le requester est membre
+        Membership requesterMembership = membershipRepository
+                .findByUserAndOrganization(requester, organization)
+                .orElseThrow(() -> new UnauthorizedException("Vous n'êtes pas membre de cette organisation."));
+
+        RoleInOrganization requesterRole = requesterMembership.getRoleInOrganisation();
+
+        // 3. Vérifier qu’il est autorisé (ADMIN ou OWNER)
+        if (!(requesterRole == RoleInOrganization.ADMINPROJECT || requesterRole == RoleInOrganization.OWNER)) {
+            throw new UnauthorizedException("Seuls les ADMIN ou OWNER peuvent modifier des rôles.");
+        }
+        // 4. Vérifier que l’utilisateur cible existe
+        User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new NotFoundException("Utilisateur introuvable."));
+        // 4. Vérifier que le membre cible existe
+        Membership targetMembership = membershipRepository
+                .findByUserAndOrganization(targetUser, organization)
+                .orElseThrow(() -> new NotFoundException("Le membre à modifier n’existe pas."));
+
+        // 5. Un ADMINPROJECT ne peut pas modifier un OWNER
+        if (requesterRole == RoleInOrganization.ADMINPROJECT &&
+                targetMembership.getRoleInOrganisation() == RoleInOrganization.OWNER) {
+            throw new UnauthorizedException("Un ADMIN ne peut pas modifier le rôle d’un OWNER.");
+        }
+        if(requesterRole == RoleInOrganization.ADMINPROJECT && newRole == RoleInOrganization.OWNER) {
+            throw new UnauthorizedException("Un ADMIN ne peut pas attribuer le rôle d’OWNER.");
+        }
+
+        // 6. Vérifie que le rôle a réellement changé
+        if (targetMembership.getRoleInOrganisation() == newRole) {
+            throw new ConflictException("Ce membre a déjà ce rôle.");
+        }
+
+        // 7. Appliquer le changement
+        targetMembership.setRoleInOrganisation(newRole);
+        membershipRepository.save(targetMembership);
     }
+
 
     @Override
     public List<Membership> getMembersByOrganization(Long organizationId, User requester) {

@@ -19,6 +19,10 @@ public class UserPrincipal implements UserDetails {
                 .map(role -> (GrantedAuthority) () -> role.getRoleName())
                 .toList();
     }
+    public User getUser() {
+        return user;
+    }
+
 
     @Override
     public String getPassword() {

@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Organization {
     @Id @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     private String name;
     private String description;
     private LocalDateTime createdAt;

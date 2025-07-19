@@ -3,6 +3,7 @@ package com.jira.jiraclone.repositories;
 import com.jira.jiraclone.entities.Membership;
 import com.jira.jiraclone.entities.Organization;
 import com.jira.jiraclone.entities.User;
+import com.jira.jiraclone.entities.enums.RoleInOrganization;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
     boolean existsByUserAndOrganization(User user, Organization organization);
 
     void deleteByUserAndOrganization(User user, Organization organization);
+
+    long countByOrganizationAndRoleInOrganisation(Organization organization, RoleInOrganization roleInOrganisation);
 }

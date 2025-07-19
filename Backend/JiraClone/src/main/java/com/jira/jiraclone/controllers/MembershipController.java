@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/memberships")
+@RequestMapping("/api")
 @CrossOrigin(origins ="http://localhost:3000, http://127.0.0.1:3000")
 public class MembershipController {
 
@@ -20,8 +20,8 @@ public class MembershipController {
     public MembershipController(IMembershipService membershipService) {
         this.membershipService = membershipService;
     }
-
-    @PostMapping("/add")
+    //1. route pour ajouter un membre à une organisation
+    @PostMapping("/memberships/add")
     public ResponseEntity<Map<String,Object>>addMembership(
             @RequestBody AddMemberRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal
@@ -39,4 +39,24 @@ public class MembershipController {
 
         return ResponseEntity.ok().body(response);
     }
+
+    //2. route pour supprimer un membre d'une organisation
+    @DeleteMapping("/organizations/{organizationId}/members/{targetUserId}")
+    public ResponseEntity<Map<String, Object>> removeMembership(
+            @PathVariable Long organizationId,
+            @PathVariable Long targetUserId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        User requester = userPrincipal.getUser();
+
+        membershipService.removeMemberFromOrganization(organizationId, targetUserId, requester);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", 200);
+        response.put("message", "Membre supprimé avec succès");
+
+        return ResponseEntity.ok().body(response);
+    }
+
+
 }

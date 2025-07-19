@@ -13,7 +13,7 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
 
     Optional<Membership> findByUserAndOrganization(User user, Organization organization);
 
-    Optional<Membership> findByOrganization(Organization organization);
+    List<Membership> findByOrganization(Organization organization);
 
     boolean existsByUserAndOrganization(User user, Organization organization);
 

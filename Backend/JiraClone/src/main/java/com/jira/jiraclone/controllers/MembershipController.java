@@ -1,7 +1,9 @@
 package com.jira.jiraclone.controllers;
 
 import com.jira.jiraclone.dtos.AddMemberRequest;
+import com.jira.jiraclone.dtos.MembershipResponse;
 import com.jira.jiraclone.dtos.UpdateMemberRoleRequest;
+import com.jira.jiraclone.entities.Membership;
 import com.jira.jiraclone.entities.User;
 import com.jira.jiraclone.entities.enums.RoleInOrganization;
 import com.jira.jiraclone.security.UserPrincipal;
@@ -11,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -83,5 +86,35 @@ public class MembershipController {
         return ResponseEntity.ok().body(response);
     }
 
+    //4. route pour récupérer tous les membres d'une organisation
+    @GetMapping("/organizations/{organizationId}/members")
+    public ResponseEntity<Map<String, Object>> getMembersByOrganization(
+            @PathVariable Long organizationId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        User requester = userPrincipal.getUser();
+
+        // Appel au service
+        List<Membership> memberships = membershipService.getMembersByOrganization(organizationId, requester);
+
+        // Mapping vers DTO
+        List<MembershipResponse> memberDTOs = memberships.stream().map(m -> {
+            User user = m.getUser();
+            return new MembershipResponse(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    m.getRoleInOrganisation()
+            );
+        }).toList();
+
+        // Construction de la réponse
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", 200);
+        response.put("members", memberDTOs);
+        response.put("count", memberDTOs.size());
+
+        return ResponseEntity.ok().body(response);
+    }
 
 }

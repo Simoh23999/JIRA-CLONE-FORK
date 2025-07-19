@@ -193,9 +193,32 @@ public class MembershipServiceImpl implements IMembershipService {
         membershipRepository.save(targetMembership);
     }
 
+    /*
+    Les Regles de cette methode getMembersByOrganization sont les suivantes:
+    0: Vérifier que l'organisation existe.
+    1: Le requester doit être membre de l’organisation.
+    2: Récupérer tous les membres de l'organisation.
+
+     */
 
     @Override
     public List<Membership> getMembersByOrganization(Long organizationId, User requester) {
-        return List.of();
+        // 0: Vérifier que l'organisation existe
+        var organization = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new NotFoundException("Organisation introuvable."));
+
+        // 1: Vérifier que le requester est membre de l'organisation
+        membershipRepository.findByUserAndOrganization(requester, organization)
+                .orElseThrow(() -> new UnauthorizedException("Vous devez être membre de l'organisation pour voir les membres."));
+
+        // 2: Récupérer tous les membres de l'organisation
+        List<Membership> members = membershipRepository.findByOrganization(organization);
+
+        if (members.isEmpty()) {
+            throw new NotFoundException("Aucun membre trouvé dans cette organisation.");
+        }
+
+        return members;
     }
+
 }

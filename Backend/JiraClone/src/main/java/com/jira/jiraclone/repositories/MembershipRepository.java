@@ -20,4 +20,8 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
     void deleteByUserAndOrganization(User user, Organization organization);
 
     long countByOrganizationAndRoleInOrganisation(Organization organization, RoleInOrganization roleInOrganisation);
+
+    boolean existsByUserEmailAndOrganizationId(String email, Long organizationId);
+
+    boolean existsByUserEmailAndOrganizationIdAndRoleInOrganisation(String email, Long organizationId, RoleInOrganization roleInOrganisation);
 }

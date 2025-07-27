@@ -1,8 +1,12 @@
 package com.jira.jiraclone.exceptions;
 
 import com.jira.jiraclone.entities.enums.RoleInOrganization;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -55,6 +59,7 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, "Conflit", ex.getMessage());
     }
 
+
     //4.  Non autorisé
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<Map<String, Object>> handleUnauthorized(UnauthorizedException ex) {
@@ -71,10 +76,32 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("error", "Accès refusé");
+        error.put("message", "Vous n'avez pas les permissions pour faire cette action");
+        error.put("status", 403);
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
     // 6. Par défaut : toute autre exception non capturée
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur interne", ex.getMessage());
+    }
+    @ExceptionHandler(OrganizationNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleOrganizationNotFound(OrganizationNotFoundException ex) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Non trouvé", ex.getMessage());
+    }
+
+    @ExceptionHandler({JwtException.class, SignatureException.class, BadCredentialsException.class})
+    public ResponseEntity<Map<String, String>> handleJwtException(Exception ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Token invalide ou signature incorrecte");
+        response.put("details", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     //  Méthode utilitaire pour construire les réponses

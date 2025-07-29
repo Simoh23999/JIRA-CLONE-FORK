@@ -25,44 +25,53 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { log } from "console";
-import router from "next/router";
 
 export function NavUser({
   user,
 }: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
+  user?: {
+    name?: string;
+    email?: string;
+    avatar?: string;
   };
 }) {
   const { isMobile } = useSidebar();
+
   function Logout() {
-    // 1. Supprimer les infos de session
     localStorage.removeItem("token");
-    // 2. Rediriger manuellement
-    // router.push("/auth");
+  }
+
+  // Si pas de user, on peut afficher un placeholder ou rien
+  if (!user) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <div className="p-2 text-sm text-gray-500">Chargement...</div>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
   }
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild className="p-2">
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-10 w-10 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage src={user.avatar ?? ""} alt={user.name ?? "U"} />
                 <AvatarFallback className="rounded-lg">
-                  {user.name[0]}{" "}
+                  {user.name?.[0] ?? "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-medium">
+                  {user.name ?? "Utilisateur"}
+                </span>
+                <span className="truncate text-xs">{user.email ?? ""}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -76,19 +85,19 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-lg">
                 <Avatar className="h-10 w-10 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage src={user.avatar ?? ""} alt={user.name ?? "U"} />
                   <AvatarFallback className="rounded-lg">
-                    {user.name[0]}
+                    {user.name?.[0] ?? "U"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-medium">
+                    {user.name ?? "Utilisateur"}
+                  </span>
+                  <span className="truncate text-xs">{user.email ?? ""}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup></DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <Link href="/dashboard/account">
@@ -113,9 +122,7 @@ export function NavUser({
               </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-
             <DropdownMenuItem variant="destructive" onClick={() => Logout()}>
-              {/* Assuming logout is a function that handles user logout */}
               <Link href="/auth" className="flex items-center">
                 <LogOut className="mr-2 h-4 w-4 text-red-500" />
                 Logout

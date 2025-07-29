@@ -28,7 +28,6 @@ import { jwtDecode } from "jwt-decode";
 import { redirect } from "next/dist/server/api-utils";
 import router, { useRouter } from "next/router";
 
-
 // Définir le type du contenu du token
 type JwtPayload = {
   name: string;
@@ -36,7 +35,7 @@ type JwtPayload = {
   exp?: number;
 };
 
-export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebarV2(props: React.ComponentProps<typeof Sidebar>) {
   const [user, setUser] = React.useState({
     name: "Utilisateur",
     email: "non défini",

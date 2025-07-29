@@ -36,19 +36,19 @@ export default function AuthPage() {
   const [checking, setChecking] = useState(true);
   const router = useRouter();
 
-  // useEffect(() => {
-  // localStorage.setItem("token", "abc123");
-  //   const token = localStorage.getItem("token");
-  //   if (token) {
-  //     router.push("/dashboard");
-  //   } else {
-  //     setChecking(false);
-  //   }
-  // }, [router]);
+  useEffect(() => {
+  localStorage.setItem("token", "abc123");
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/dashboard");
+    } else {
+      setChecking(false);
+    }
+  }, [router]);
 
-  // if (checking) {
-  //   return <RequireAuth> </RequireAuth>;
-  // }
+  if (checking) {
+    return <RequireAuth> </RequireAuth>;
+  }
 
   const validateField = (
     schema: ZodObject<ZodRawShape>,

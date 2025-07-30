@@ -63,7 +63,7 @@ public class OrganizationController {
 
     // DELETE /organizations/{id}
     @DeleteMapping("/{id}")
-//    @PreAuthorize("@organizationSecurityService.canEditAndDeleteOrganization(#id,authentication)")
+    @PreAuthorize("@organizationSecurityService.canEditAndDeleteOrganization(#id,authentication)")
     public ResponseEntity<Map<String, Object>> deleteOrganization(@PathVariable Long id) {
         organizationService.deleteOrganization(id);
         Map<String, Object> response = new HashMap<>();

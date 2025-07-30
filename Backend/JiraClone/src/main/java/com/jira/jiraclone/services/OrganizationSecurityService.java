@@ -53,12 +53,6 @@ public class OrganizationSecurityService {
 
 
 
-
-
-
-
-
-
     private boolean hasGlobalRole(UserPrincipal userPrincipal, String role){
         return userPrincipal.getAuthorities().stream()
                 .anyMatch(g -> g.getAuthority().equals("ROLE_"+role));

@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useState, useTransition  } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import AuthContainer from "../../components/auth/AuthContainer";
 import AuthCard from "../../components/auth/AuthCard";
 import LoginForm from "../../components/auth/LoginForm";
 import SignupForm from "../../components/auth/SignupForm";
-import RequireAuth from "@/components/RequireAuth";
 import { loginSchema, signupSchema } from "./validations/auth";
 import { ZodObject, ZodRawShape } from "zod";
+import { jwtDecode } from "jwt-decode";
+import { JwtPayload } from "../../types/jwt";
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<"connexion" | "inscription">(
@@ -36,7 +37,7 @@ export default function AuthPage() {
     confirmPassword?: string;
   }>({});
 
-  const [checking, setChecking] = useState(true);
+  // const [checking, setChecking] = useState(true);
   const router = useRouter();
 
   const validateField = (
@@ -80,15 +81,24 @@ export default function AuthPage() {
           { email, password },
           {
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
 
         const token = response.data?.token;
+        const decoded = jwtDecode<JwtPayload>(token);
+        console.log("data:", decoded);
         if (token) {
+          // user.email = decoded.email;
+
           if (rememberMe) {
             localStorage.setItem("token", token);
+            console.log("token:", token);
+
+            // localStorage.setItem("token", "asasas");
           } else {
             sessionStorage.setItem("token", token);
+            console.log("token:", token);
+            console.log("user:", response.data.user);
           }
         }
 
@@ -123,16 +133,16 @@ export default function AuthPage() {
       setSignupErrors(formatted);
       return;
     }
-        startTransition(async () => {
+    startTransition(async () => {
       try {
-        const response = await axios.post(
+        await axios.post(
           "http://localhost:9090/api/auth/register",
           { fullName, email, password },
           {
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
-    
+
         router.push("/auth"); // // Rediriger vers login page (a discuter)
       } catch (err: any) {
         const message =

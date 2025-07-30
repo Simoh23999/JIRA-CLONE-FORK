@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useState } from "react";
 import {
   CheckCircle,
   Frame,
@@ -24,26 +24,38 @@ import {
 
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
-import { redirect } from "next/dist/server/api-utils";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 // Définir le type du contenu du token
+// type JwtPayload = {
+//   name: string;
+//   email: string;
+//   exp?: number;
+// };
 type JwtPayload = {
-  name: string;
   email: string;
-  exp?: number;
+  exp: number;
+  iat: number;
+  roles: string[];
+  sub: string;
+  username: string;
 };
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
-  const [user, setUser] = React.useState({
+  const pathname = usePathname();
+  const [user, setUser] = useState({
     name: "Utilisateur",
     email: "non défini",
     avatar: "/avatars/avatar.jpg",
   });
+  const router = useRouter();
 
-  React.useEffect(() => {
+  useEffect(() => {
     try {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      console.log("Token récupéré:", token);
       if (!token) {
         console.warn(
           "Aucun token trouvé, redirection vers la page de connexion",
@@ -61,15 +73,16 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         } else {
           setUser((prev) => ({
             ...prev,
-            name: decoded.name,
+            name: decoded.username,
             email: decoded.email,
           }));
+          console.log("Token valide, utilisateur:", decoded);
         }
       }
     } catch (err) {
       console.error("Erreur lors du décodage du token :", err);
     }
-  }, []);
+  }, [router]);
 
   const data = {
     user,
@@ -107,7 +120,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} currentPath={pathname} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>

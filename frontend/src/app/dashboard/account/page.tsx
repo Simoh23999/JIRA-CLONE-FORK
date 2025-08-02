@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ProfileHeader } from "../../../components/profile/Header";
 import { PersonalInfoCard } from "../../../components/profile/PersonalInfoCard";
 import { SecurityCard } from "../../../components/profile/securityCard";
@@ -12,6 +12,12 @@ import { useProfileData } from "../../../hooks/useProfileData";
 import { useToast } from "../../../hooks/useToast";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "../../../types/jwt";
+import axios from "axios";
+
+const generateDefaultPhotoUrl = (username: string): string => {
+  const initial = (username || "U")[0].toUpperCase();
+  return `https://placehold.co/120x120/E5E7EB/6B7280?text=${initial}`;
+};
 
 export default function ProfilePage() {
   const {
@@ -22,17 +28,23 @@ export default function ProfilePage() {
     handlePasswordSubmit,
   } = usePasswordModal();
 
+  const { toast, showToast } = useToast();
+
   const [profileDataLoaded, setProfileDataLoaded] = useState(false);
-  const [profileInit, setProfileInit] = useState(false);
+  // const [profileInit, setProfileInit] = useState(false);
   const [initialProfileData, setInitialProfileData] = useState({
-    name: "Simo Tlili",
-    email: "Simo.Tlili@company.com",
+    name: "",
+    email: "",
     description: "",
-    photoUrl: "https://placehold.co/120x120/E5E7EB/6B7280?text=ST",
+    photoUrl: "",
   });
 
+  const [decodedReady, setDecodedReady] = useState(false);
+
+  const profileInitialized = useRef(false);
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (profileInitialized.current) return;
 
     try {
       const token =
@@ -54,13 +66,69 @@ export default function ProfilePage() {
         photoUrl: `https://placehold.co/120x120/E5E7EB/6B7280?text=${(decoded.username || "U")[0]}`,
       });
 
+      if (profileInitialized.current) return;
       setProfileDataLoaded(true);
+      // setProfileInit(true);
     } catch (err) {
       console.error("Erreur de décodage du token :", err);
     }
   }, []);
 
   type AutoSaveStatus = "idle" | "saving" | "saved";
+  // const {
+  //   profileData,
+  //   validationErrors,
+  //   autoSaveStatus,
+  //   updateName,
+  //   updateEmail,
+  //   updateDescription,
+  // } = profileInit
+  //   ? useProfileData(initialProfileData)
+  //   : {
+  //       profileData: initialProfileData,
+  //       validationErrors: {},
+  //       autoSaveStatus: "idle" as AutoSaveStatus,
+  //       updateName: () => false,
+  //       updateEmail: () => false,
+  //       updateDescription: () => false,
+  //     };
+  // const hookValues = useProfileData(initialProfileData);
+
+  // const {
+  //   profileData,
+  //   validationErrors,
+  //   autoSaveStatus,
+  //   updateName,
+  //   updateEmail,
+  //   updateDescription,
+  // } = profileInit
+  //   ? hookValues
+  //   : {
+  //       profileData: initialProfileData,
+  //       validationErrors: {},
+  //       autoSaveStatus: "idle" as AutoSaveStatus,
+  //       updateName: () => false,
+  //       updateEmail: () => false,
+  //       updateDescription: () => false,
+  //     };
+
+  //   const {
+  //   profileData,
+  //   validationErrors,
+  //   autoSaveStatus,
+  //   updateName,
+  //   updateEmail,
+  //   updateDescription,
+  // } = useProfileData(initialProfileData);
+
+  // const [profileDataHook, setProfileDataHook] = useState<ReturnType<typeof useProfileData>>(null);
+  // useEffect(() => {
+  //   if (profileDataLoaded) {
+  //     const hook = useProfileData(initialProfileData);
+  //     setProfileDataHook(hook);
+  //   }
+  // }, [profileDataLoaded]);
+
   const {
     profileData,
     validationErrors,
@@ -68,36 +136,22 @@ export default function ProfilePage() {
     updateName,
     updateEmail,
     updateDescription,
-  } = profileInit
-    ? useProfileData(initialProfileData)
-    : {
-        profileData: initialProfileData,
-        validationErrors: {},
-        autoSaveStatus: "idle" as AutoSaveStatus,
-        updateName: () => false,
-        updateEmail: () => false,
-        updateDescription: () => false,
-      };
-
-  const { toast, showToast } = useToast();
+  } = useProfileData(initialProfileData);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  if (!profileDataLoaded) {
-    return <p>Chargement du profil...</p>;
-  }
-
-  const handleNameChange = (name: string) => {
-    const success = updateName(name);
+  const handleNameChange = async (name: string) => {
+    console.log("handleNameChange :", name);
+    const success = await updateName(name);
     showToast(
       success ? "success" : "error",
       success ? "Nom sauvegardé avec succès" : "Erreur de validation du nom",
     );
   };
 
-  const handleEmailChange = (email: string) => {
+  const handleEmailChange = async (email: string) => {
     const success = updateEmail(email);
     showToast(
       success ? "success" : "error",
@@ -107,7 +161,7 @@ export default function ProfilePage() {
     );
   };
 
-  const handleDescriptionChange = (description: string) => {
+  const handleDescriptionChange = async (description: string) => {
     const success = updateDescription(description);
     showToast(
       success ? "success" : "error",
@@ -117,7 +171,7 @@ export default function ProfilePage() {
     );
   };
 
-  const handlePhotoChange = () => {
+  const handlePhotoChange = async () => {
     // Implement photo change logic
     console.log("Photo change clicked");
   };
@@ -146,52 +200,62 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 font-sans relative">
-      <AutoSaveIndicator status={autoSaveStatus} />
+    <>
+      {profileDataLoaded && (
+        <div className="min-h-screen w-full bg-gray-50 font-sans relative">
+          <AutoSaveIndicator status={autoSaveStatus} />
 
-      {toast && (
-        <Toast type={toast.type} message={toast.message} onClose={() => {}} />
+          {toast && (
+            <Toast
+              type={toast.type}
+              message={toast.message}
+              onClose={() => {}}
+            />
+          )}
+
+          <div className="max-w-[1200px] mx-auto px-4 max-sm:px-3 py-8 max-sm:py-4">
+            <ProfileHeader
+              name={profileData.name}
+              email={profileData.email}
+              description={profileData.description}
+              photoUrl={profileData.photoUrl || "https://placehold.co/120x120"}
+              onNameChange={handleNameChange}
+              onEmailChange={handleEmailChange}
+              onDescriptionChange={handleDescriptionChange}
+              onPhotoChange={handlePhotoChange}
+              validationErrors={validationErrors}
+            />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-sm:gap-4 items-start">
+            <PersonalInfoCard
+              nameValue={profileData.name}
+              setNameValue={handleNameChange}
+              emailValue={profileData.email}
+              setEmailValue={handleEmailChange}
+              descriptionValue={profileData.description}
+              setDescriptionValue={handleDescriptionChange}
+            />
+
+            <SecurityCard onOpenPasswordModal={openPasswordModal} />
+          </div>
+          <PasswordModal
+            isOpen={showPasswordModal}
+            onClose={closePasswordModal}
+            onSubmit={handlePasswordChange}
+            showPassword={showPassword}
+            showNewPassword={showNewPassword}
+            showConfirmPassword={showConfirmPassword}
+            onTogglePassword={() => setShowPassword(!showPassword)}
+            onToggleNewPassword={() => setShowNewPassword(!showNewPassword)}
+            onToggleConfirmPassword={() =>
+              setShowConfirmPassword(!showConfirmPassword)
+            }
+            validationErrors={
+              passwordValidationErrors as { [key: string]: string }
+            }
+          />
+        </div>
       )}
-
-      <div className="max-w-[1200px] mx-auto px-4 max-sm:px-3 py-8 max-sm:py-4">
-        <ProfileHeader
-          name={profileData.name}
-          email={profileData.email}
-          description={profileData.description}
-          photoUrl={profileData.photoUrl}
-          onNameChange={handleNameChange}
-          onEmailChange={handleEmailChange}
-          onDescriptionChange={handleDescriptionChange}
-          onPhotoChange={handlePhotoChange}
-          validationErrors={validationErrors}
-        />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-sm:gap-4 items-start">
-        <PersonalInfoCard
-          nameValue={profileData.name}
-          setNameValue={handleNameChange}
-          emailValue={profileData.email}
-          setEmailValue={handleEmailChange}
-          descriptionValue={profileData.description}
-          setDescriptionValue={handleDescriptionChange}
-        />
-
-        <SecurityCard onOpenPasswordModal={openPasswordModal} />
-      </div>
-      <PasswordModal
-        isOpen={showPasswordModal}
-        onClose={closePasswordModal}
-        onSubmit={handlePasswordChange}
-        showPassword={showPassword}
-        showNewPassword={showNewPassword}
-        showConfirmPassword={showConfirmPassword}
-        onTogglePassword={() => setShowPassword(!showPassword)}
-        onToggleNewPassword={() => setShowNewPassword(!showNewPassword)}
-        onToggleConfirmPassword={() =>
-          setShowConfirmPassword(!showConfirmPassword)
-        }
-        validationErrors={passwordValidationErrors as { [key: string]: string }}
-      />
-    </div>
+    </>
   );
 }

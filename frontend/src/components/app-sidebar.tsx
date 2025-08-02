@@ -26,6 +26,7 @@ import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+// import { useUser } from "@/app/context/UserContext";
 
 // Définir le type du contenu du token
 // type JwtPayload = {
@@ -44,14 +45,47 @@ type JwtPayload = {
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  // const { user } = useUser();
   const [user, setUser] = useState({
     name: "Utilisateur",
     email: "non défini",
-    avatar: "/avatars/avatar.jpg",
+    // avatar: "/avatars/avatar.jpg",
   });
   const router = useRouter();
+  const [refreshUser, setRefreshUser] = useState(false);
 
   useEffect(() => {
+    //   const fetchUserData = async () => {
+    //   const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+    //   if (!token) {
+    //     console.warn("Aucun token trouvé, redirection vers la page de connexion");
+    //     router.push("/auth");
+    //     return;
+    //   }
+
+    //   try {
+    //     const response = await axios.get("http://localhost:9090/api/me", {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     });
+
+    //     const userData = response.data;
+
+    //     setUser({
+    //       name: userData.username,
+    //       email: userData.email,
+    //     });
+
+    //     console.log("Données utilisateur à jour:", userData);
+    //   } catch (error) {
+    //     console.error("Erreur lors de la récupération des infos utilisateur:", error);
+    //     router.push("/auth");
+    //   }
+    // };
+
+    // fetchUserData();
     try {
       const token =
         localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -82,7 +116,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     } catch (err) {
       console.error("Erreur lors du décodage du token :", err);
     }
-  }, [router]);
+  }, [router, refreshUser]);
 
   const data = {
     user,

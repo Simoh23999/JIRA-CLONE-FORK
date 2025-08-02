@@ -405,8 +405,14 @@ function SidebarGroupLabel({
       data-slot="sidebar-group-label"
       data-sidebar="group-label"
       className={cn(
-        " text-amber-500 ring-sidebar-ring flex h-10 shrink-0 items-center rounded-md px-2 text-lg font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-5 [&>svg]:shrink-0",
+        // base style
+        "text-[#769fcd] ring-sidebar-ring flex shrink-0 items-center rounded-md transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-5 [&>svg]:shrink-0",
+        // typo and spacing
+        "font-semibold uppercase text-xs tracking-wider mb-3 pl-3 opacity-90",
+        "h-auto py-2",
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
+        // separateur
+        "relative after:content-[''] after:block after:h-px after:bg-[#d6e6f2] after:mt-2 after:mb-1 after:w-[calc(100%-12px)] after:ml-0",
         className,
       )}
       {...props}
@@ -474,25 +480,24 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  // base styles
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-[12px] text-left text-sm transition-all duration-200 ease-in-out font-medium relative bg-transparent text-[#4a4a4a] my-[2px] mx-0 px-[12px] py-[10px] focus-visible:outline-2 focus-visible:outline-[#769fcd] focus-visible:outline-offset-2",
   {
     variants: {
       variant: {
-        primary:
-          "bg-gradient-to-b from-[#005BAC] to-[#3F3F3F] text-white hover:from-[#3F3F3F] hover:to-[#005BAC]",
-        destructive:
-          "bg-gradient-to-b from-[#F5B731] to-[#F2853F] text-white hover:from-[#F2853F] hover:to-[#E13B7F]",
-        outline:
-          "border border-[#005BAC] bg-white text-[#005BAC] hover:bg-[#5AC9F1]/20",
-        secondary: "bg-[#5AC9F1] text-[#005BAC] hover:bg-[#5AC9F1]/80",
-        ghost:
-          "border-transparent shadow-none text-[#C82171]] hover:bg-[#C82171]/20",
-        muted: "bg-[#F5F5F5] text-[#3F3F3F] hover:bg-[#F5F5F5]/80",
         tertiary:
-          "bg-[#E13B7F]/10 text-[#E13B7F] border border-transparent hover:bg-[#E13B7F]/20",
+          // states (hover, active ...)
+          "hover:bg-[#d6e6f2] hover:text-[#213b61] hover:shadow-[0_2px_4px_rgba(118,159,205,0.12)] hover:-translate-y-[1px] \
+          active:bg-[#b9d7ea] active:text-[#213b61] active:font-semibold active:shadow-[0_3px_8px_rgba(118,159,205,0.18)] \
+          data-[active=true]:bg-[#b9d7ea] data-[active=true]:text-[#213b61] data-[active=true]:font-semibold data-[active=true]:shadow-[0_3px_8px_rgba(118,159,205,0.18)] \
+          data-[state=open]:bg-[#b9d7ea] data-[state=open]:text-[#213b61] data-[state=open]:font-semibold \
+          [&>svg]:text-[#7a7a7a] hover:[&>svg]:text-[#769fcd] data-[active=true]:[&>svg]:text-[#769fcd] data-[state=open]:[&>svg]:text-[#769fcd] \
+          [&>svg]:transition-colors [&>svg]:duration-200 [&>svg]:size-[18px] [&>svg]:shrink-0 \
+          [&>span:last-child]:truncate",
       },
       size: {
-        default: "h-8 text-sm",
+        default: "text-sm py-[10px] px-[12px]",
+        // default: "text-sm py-[10px] px-[12px] md:px-[12px] md:py-[10px] px-[10px] py-[8px] text-[0.875rem]",
         sm: "h-6 rounded-md px-3",
         xs: "h-7 rounded-md px-2 text-xs",
         lg: "h-12 rounded-md px-8",
@@ -509,7 +514,7 @@ const sidebarMenuButtonVariants = cva(
 function SidebarMenuButton({
   asChild = false,
   isActive = false,
-  variant = "ghost",
+  variant = "tertiary",
   size = "default",
   tooltip,
   className,

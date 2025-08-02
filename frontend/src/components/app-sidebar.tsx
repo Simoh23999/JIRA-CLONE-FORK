@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useState } from "react";
 import {
   CheckCircle,
   Frame,
@@ -24,26 +24,72 @@ import {
 
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
-import { redirect } from "next/dist/server/api-utils";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+// import { useUser } from "@/app/context/UserContext";
 
 // Définir le type du contenu du token
+// type JwtPayload = {
+//   name: string;
+//   email: string;
+//   exp?: number;
+// };
 type JwtPayload = {
-  name: string;
   email: string;
-  exp?: number;
+  exp: number;
+  iat: number;
+  roles: string[];
+  sub: string;
+  username: string;
 };
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
-  const [user, setUser] = React.useState({
+  const pathname = usePathname();
+  // const { user } = useUser();
+  const [user, setUser] = useState({
     name: "Utilisateur",
     email: "non défini",
-    avatar: "/avatars/avatar.jpg",
+    // avatar: "/avatars/avatar.jpg",
   });
+  const router = useRouter();
+  const [refreshUser, setRefreshUser] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    //   const fetchUserData = async () => {
+    //   const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+    //   if (!token) {
+    //     console.warn("Aucun token trouvé, redirection vers la page de connexion");
+    //     router.push("/auth");
+    //     return;
+    //   }
+
+    //   try {
+    //     const response = await axios.get("http://localhost:9090/api/me", {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     });
+
+    //     const userData = response.data;
+
+    //     setUser({
+    //       name: userData.username,
+    //       email: userData.email,
+    //     });
+
+    //     console.log("Données utilisateur à jour:", userData);
+    //   } catch (error) {
+    //     console.error("Erreur lors de la récupération des infos utilisateur:", error);
+    //     router.push("/auth");
+    //   }
+    // };
+
+    // fetchUserData();
     try {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      console.log("Token récupéré:", token);
       if (!token) {
         console.warn(
           "Aucun token trouvé, redirection vers la page de connexion",
@@ -61,15 +107,16 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         } else {
           setUser((prev) => ({
             ...prev,
-            name: decoded.name,
+            name: decoded.username,
             email: decoded.email,
           }));
+          console.log("Token valide, utilisateur:", decoded);
         }
       }
     } catch (err) {
       console.error("Erreur lors du décodage du token :", err);
     }
-  }, []);
+  }, [router, refreshUser]);
 
   const data = {
     user,
@@ -107,7 +154,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} currentPath={pathname} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>

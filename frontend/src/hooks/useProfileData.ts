@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import axios from "axios";
 interface ProfileData {
   name: string;
   email: string;
@@ -18,6 +18,9 @@ export const useProfileData = (initialData: ProfileData) => {
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
     {},
   );
+  useEffect(() => {
+    setProfileData(initialData);
+  }, [initialData]);
   const [autoSaveStatus, setAutoSaveStatus] = useState<AutoSaveStatus>("idle");
 
   const validateEmail = (email: string) => {
@@ -26,6 +29,7 @@ export const useProfileData = (initialData: ProfileData) => {
   };
 
   const validateName = (name: string) => {
+    console.log("Validating name:", name);
     return name.trim().length >= 2;
   };
 
@@ -39,7 +43,22 @@ export const useProfileData = (initialData: ProfileData) => {
     }, 500);
   };
 
-  const updateName = (name: string) => {
+  // const updateName = (name: string) => {
+  //   const errors: ValidationErrors = {};
+
+  //   if (!validateName(name)) {
+  //     errors.name = "Le nom doit contenir au moins 2 caractères";
+  //     setValidationErrors(errors);
+  //     return false;
+  //   }
+
+  //   setValidationErrors({});
+  //   setProfileData((prev) => ({ ...prev, name }));
+  //   showSaveAnimation();
+  //   return true;
+  // };
+  const updateName = async (name: string) => {
+    console.log("updateName called with:", name);
     const errors: ValidationErrors = {};
 
     if (!validateName(name)) {
@@ -48,10 +67,39 @@ export const useProfileData = (initialData: ProfileData) => {
       return false;
     }
 
-    setValidationErrors({});
-    setProfileData((prev) => ({ ...prev, name }));
-    showSaveAnimation();
-    return true;
+    try {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      const response = await axios.put(
+        "http://localhost:9090/api/me",
+        {
+          username: name,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      setValidationErrors({});
+      setProfileData((prev) => ({ ...prev, name }));
+      showSaveAnimation();
+
+      return true;
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du nom:", error);
+
+      let errorMessage = "Erreur lors de la sauvegarde du nom";
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+
+      setValidationErrors({ name: errorMessage });
+      // showToast("error", errorMessage);
+
+      return false;
+    }
   };
 
   const updateEmail = (email: string) => {

@@ -4,7 +4,7 @@ import { SquarePen, Check, X } from "lucide-react";
 
 interface EditableFieldProps {
   value: string;
-  onSave: (value: string) => void;
+  onSave: (value: string) => Promise<void>;
   onCancel?: () => void;
   validationError?: string;
   placeholder?: string;
@@ -37,8 +37,8 @@ export const EditableField: React.FC<EditableFieldProps> = ({
   const [currentValue, setCurrentValue] = useState(value);
   const [isHovered, setIsHovered] = useState(false);
 
-  const handleSave = () => {
-    onSave(currentValue);
+  const handleSave = async () => {
+    await onSave(currentValue);
     setIsEditing(false);
   };
 

@@ -9,10 +9,10 @@ interface ProfileHeaderProps {
   email: string;
   description: string;
   photoUrl: string;
-  onNameChange: (name: string) => void;
-  onEmailChange: (email: string) => void;
-  onDescriptionChange: (description: string) => void;
-  onPhotoChange?: () => void;
+  onNameChange: (name: string) => Promise<void>;
+  onEmailChange: (email: string) => Promise<void>;
+  onDescriptionChange: (description: string) => Promise<void>;
+  onPhotoChange?: () => Promise<void>;
   validationErrors: { [key: string]: string };
 }
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 interface PasswordValidationErrors {
   currentPassword?: string;
@@ -52,12 +53,12 @@ export const usePasswordModal = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handlePasswordSubmit = (
+  const handlePasswordSubmit = async (
     currentPassword: string,
     newPassword: string,
     confirmPassword: string,
     onSuccess: () => void,
-    onError: () => void,
+    onError: (message?: string) => void,
   ) => {
     const isValid = validatePassword(
       currentPassword,
@@ -66,11 +67,41 @@ export const usePasswordModal = () => {
     );
 
     if (isValid) {
-      setPasswordValidationErrors({});
-      setShowPasswordModal(false);
-      onSuccess();
+      try {
+        const token =
+          localStorage.getItem("token") || sessionStorage.getItem("token");
+        const response = await axios.put(
+          "http://localhost:9090/api/me/password",
+          {
+            currentPassword,
+            newPassword,
+            confirmPassword,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        setPasswordValidationErrors({});
+        setShowPasswordModal(false);
+        onSuccess();
+
+        // showToast("success", response.data.message || "Mot de passe mis à jour avec succès");
+      } catch (error) {
+        console.error("Erreur lors du changement de mot de passe:", error);
+
+        let errorMessage = "Erreur lors du changement de mot de passe";
+        if (axios.isAxiosError(error) && error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        }
+
+        // showToast("error", errorMessage)
+        onError(errorMessage);
+      }
     } else {
-      onError();
+      onError("Erreurs de validation");
     }
   };
 

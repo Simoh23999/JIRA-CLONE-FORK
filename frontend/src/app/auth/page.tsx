@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition  } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import AuthContainer from "../../components/auth/AuthContainer";
 import AuthCard from "../../components/auth/AuthCard";
 import LoginForm from "../../components/auth/LoginForm";
@@ -10,6 +11,7 @@ import RequireAuth from "@/components/RequireAuth";
 import { loginSchema, signupSchema } from "./validations/auth";
 import { ZodObject, ZodRawShape } from "zod";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9090";
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<"connexion" | "inscription">(
     "connexion",
@@ -22,6 +24,8 @@ export default function AuthPage() {
   const [fullName, setFullName] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
+  const [isPending, startTransition] = useTransition();
+  const [serverError, setServerError] = useState<string | null>(null);
   const [loginErrors, setLoginErrors] = useState<{
     email?: string;
     password?: string;
@@ -36,8 +40,8 @@ export default function AuthPage() {
   const [checking, setChecking] = useState(true);
   const router = useRouter();
 
+  
   useEffect(() => {
-  localStorage.setItem("token", "abc123");
     const token = localStorage.getItem("token");
     if (token) {
       router.push("/dashboard");
@@ -49,7 +53,6 @@ export default function AuthPage() {
   if (checking) {
     return <RequireAuth> </RequireAuth>;
   }
-
   const validateField = (
     schema: ZodObject<ZodRawShape>,
     fieldName: string,
@@ -83,13 +86,37 @@ export default function AuthPage() {
       setLoginErrors(formatted);
       return;
     }
-    localStorage.setItem("token", "abc123");
-    const token = localStorage.getItem("token");
-    if (token) {
-      router.push("/dashboard");
-    } else {
-      setChecking(false);
-    }
+
+
+    startTransition(async () => {
+      try {
+        const response = await axios.post(
+          `${BASE_URL}/api/auth/authenticate`,
+          { email, password },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+
+        const token = response.data?.token;
+        if (token) {
+          if (rememberMe) {
+            localStorage.setItem("token", token);
+          } else {
+            sessionStorage.setItem("token", token);
+          }
+        }
+
+        router.push("/dashboard"); // Rediriger vers dashboard
+      } catch (err: any) {
+        const message =
+          err.response?.data?.message ||
+          err.message ||
+          "Une erreur est survenue. Veuillez réessayer.";
+        setServerError(message);
+      }
+    });
+
     console.log("Login:", { email, password, rememberMe });
   };
 
@@ -111,6 +138,25 @@ export default function AuthPage() {
       setSignupErrors(formatted);
       return;
     }
+        startTransition(async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:9090/api/auth/register",
+          { fullName, email, password },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+    
+        router.push("/auth"); // // Rediriger vers login page (a discuter)
+      } catch (err: any) {
+        const message =
+          err.response?.data?.message ||
+          err.message ||
+          "Une erreur est survenue. Veuillez réessayer.";
+        setServerError(message);
+      }
+    });
     console.log("Signup:", { fullName, email, password, confirmPassword });
   };
 
@@ -199,5 +245,6 @@ export default function AuthPage() {
         )}
       </AuthCard>
     </AuthContainer>
+    
   );
 }

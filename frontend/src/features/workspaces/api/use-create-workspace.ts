@@ -1,38 +1,35 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "sonner";
 import z from "zod";
 import { createWorkSpaceSchema } from "../schemas";
-import { toast } from "sonner";
-import axios from "axios";
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9090";
 
-export const useCreateWorkspace = (
-  values: z.infer<typeof createWorkSpaceSchema>
-): Promise<void> => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const url = `${baseURL}/organizations`;
-      const token = localStorage.getItem("token");
+export const useCreateWorkspace = () => {
+  const queryClient = useQueryClient();
 
-      const response = await axios.post(url, values, {
+  return useMutation({
+    mutationFn: async (values: z.infer<typeof createWorkSpaceSchema>) => {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(`${baseURL}/organizations`, values, {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
-
-      const { message } = response.data;
-      toast.success(message || "Organisation créée avec succès");
-      resolve();
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        const backendMessage = error.response?.data?.message;
-
-        toast.error(backendMessage || "Erreur serveur lors de la création de l'organisation.");
-        reject(new Error(backendMessage || "Erreur serveur"));
-      } else {
-        toast.error("Une erreur inconnue est survenue.");
-        reject(error);
-      }
-    }
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Organisation créée avec succès");
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+    },
+    onError: (error: any) => {
+      const message =
+        axios.isAxiosError(error) && error.response?.data?.message
+          ? error.response.data.message
+          : "Erreur serveur lors de la création de l'organisation.";
+      toast.error(message);
+    },
   });
 };

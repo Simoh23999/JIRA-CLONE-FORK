@@ -8,29 +8,27 @@ const buttonVariants = cva(
  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:bg-neutral-100 disabled:from-neutral-100 disabled:to-neutral-100  disabled:text-neutral-300 border border-neutral-200 shadow-sm [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
-      variant: {
+  variant: {
+    primary:
+      "bg-[#24527a] text-white hover:bg-[#2e6aa3]",
 
-       primary:
-        "bg-[#769fcd] text-white hover:bg-[#5a8bb5]",
+    destructive:
+      "bg-[#f26430] text-white hover:bg-[#d94c18]",
 
-      destructive:
-        "bg-[#F2853F] text-white hover:bg-[#E13B7F]",
+    outline:
+      "border border-[#24527a] bg-white text-[#24527a] hover:bg-[#d6e6f2]",
 
-      outline:
-        "border border-[#769fcd] bg-white text-[#769fcd] hover:bg-[#d6e6f2]",
+    secondary:
+      "bg-[#d6e6f2] text-[#2a2e35] hover:bg-[#b9d7ea]",
 
-      secondary:
-        "bg-[#d6e6f2] text-[#3F3F3F] hover:bg-[#b9d7ea]",
+    ghost:
+      "bg-transparent text-[#24527a] hover:bg-[#d6e6f2]",
 
-      ghost:
-        "bg-transparent text-[#769fcd] hover:bg-[#d6e6f2]",
+    muted:
+      "bg-[#f7fbfc] text-[#2a2e35] hover:bg-[#d6e6f2]",
 
-      muted:
-        "bg-[#f7fbfc] text-[#3F3F3F] hover:bg-[#d6e6f2]",
-
-      tertiary:
-        "bg-[#b9d7ea] text-[#3F3F3F] hover:bg-[#769fcd] hover:text-white"
-
+    tertiary:
+      "bg-[#b9d7ea] text-[#2a2e35] hover:bg-[#24527a] hover:text-white"
        
         // Uncomment and customize these variants if needed
         // These are examples and can be modified or removed as per your design requirements

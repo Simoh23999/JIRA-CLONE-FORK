@@ -37,7 +37,7 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
-  const { workspaces, loading } = useGetWorkspaces();
+  const { data: workspaces, isLoading, isError, error } = useGetWorkspaces();
   
   const currentPage =
     segments.length > 1
@@ -46,15 +46,13 @@ export default function DashboardLayout({
 
   const [open, setOpen] = useState(false);
   const canClose = !!(workspaces && workspaces.length > 0);
-  const [queryClient] = useState(() => new QueryClient());
   useEffect(() => {
-    if (!loading && (!workspaces || workspaces.length === 0)) {
+    if (!isLoading && (!workspaces || workspaces.length === 0)) {
       setOpen(true);
     }
-  }, [loading, workspaces]);
+  }, [isLoading, workspaces]);
 
   return (
-    <QueryClientProvider client={queryClient}>
     <RequireAuth>
       <CreateWorkspaceModal open={open} onOpenChange={setOpen} canClose={canClose} />
       <SidebarProvider>
@@ -88,6 +86,5 @@ export default function DashboardLayout({
         </SidebarInset>
       </SidebarProvider>
     </RequireAuth>
-    </QueryClientProvider>
   );
 }

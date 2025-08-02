@@ -1,6 +1,9 @@
 "use client";
+import {
+  useGetOrganization,
+  useGetOrganizationMembers
+} from "@/features/workspaces/api/use-get-workspace";
 
-import { useGetWorkspace,useGetMembers } from "@/features/workspaces/api/use-get-workspace";
 import { useParams, useRouter } from "next/navigation";
 import DashboardLoading from "../../loading";
 
@@ -18,42 +21,56 @@ import Link from "next/link";
 import { jwtDecode } from "jwt-decode";
 import { ca } from "zod/v4/locales";
 
+
+type JwtPayload = {
+  roles:string;
+  username: string;
+  email: string;
+  exp: number;
+  sub:string;
+  iat: number;
+};
+
 export default function OrganizationDetail() {
   const params = useParams();
   const id = Number(params.id);
   const router = useRouter();
-  const { workspace, loading, error } = useGetWorkspace(id);
-  const{ members ,loadingM ,errorM}=useGetMembers(id); 
+  const { data: workspace, isLoading: loading, error } = useGetOrganization(id);
+  const { data: members, isLoading: loadingM, error: errorM } = useGetOrganizationMembers(id);
+  var isAdminOrOwner=false;
 
+  // Trouver l'organisateur (membre avec rôle OWNER)
+const organizer = members?.find((m) => m.role === "OWNER") || null;
 
+// Filtrer les autres membres (exclure l'organisateur)
+const filteredMembers = members?.filter((m) => m.role !== "OWNER") || [];
 
-  
-
-
-
-  const user = {
-    id: 1, // Remplacez par l'ID de l'utilisateur connecté
-    fullName: "John Doe", // Remplacez par le nom complet de l'utilisateur connecté
-    avatarUrl: "https://example.com/avatar.jpg", // Remplacez par l'URL de l'avatar de l'utilisateur connecté
-    email: "l",
-    role: "member", // Remplacez par le rôle de l'utilisateur connecté
+  const token = localStorage.getItem("token");
+  if (!token) {
+    router.push("/auth");
+    return null;
   }
 
-    // const token = localStorage.getItem("token");
-//   if (!token) {
-//     router.push("/auth");
-//     return null;
-//   }
+if (token && members) {
+  const decoded = jwtDecode<JwtPayload>(token) ;
 
-// if (token) {
-//   const decoded = jwtDecode(token) ;
-//   const email = decoded.email || decoded.sub || "";
-//   const member = members.find((m) => m.email === email) || null;
-// }
+  if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+          console.warn("Token expiré");
+          localStorage.removeItem("token");
+          // Rediriger vers la page de connexion
+          router.push("/auth");
+        } else {
+
+  const email =decoded.email;
+  const member = members.find((m) => m.email === email) || null;
+  if( member?.role === "ADMIN" || member?.role === "OWNER" ){
+  isAdminOrOwner =true;
+  }
+ }
+}
  
    // State pour modal ouvert/fermé
-  user.role = "member"; // Assurez-vous que le rôle est défini
-  const isAdminOrOwner = user.role === "admin" || user.role === "owner";
+  
    // State pour modal ouvert/fermé
   const [open, setOpen] = useState(false);
   
@@ -102,39 +119,49 @@ export default function OrganizationDetail() {
             {workspace?.description || "Aucune description disponible"}
           </p>
         </div>
-        {/* <Button variant="outline" size="sm" onClick={handleEdit} className="rounded-full">
-          <Settings className="size-4 mr-1" />
-          Modifier
-        </Button> */}
+
+
+
+
+
+    
 
 
 
 {isAdminOrOwner && (
-      <Button>Supprimer l'organisation</Button>
+           <Button variant="outline" size="sm" onClick={handleEdit} className="rounded-full">
+          <Settings className="size-4 mr-1" />
+          Modifier
+        </Button>
+
     )}
 
       </div>
 
-      {/* Organisateur */}
-      <Card className="mb-4 shadow-sm rounded-xl">
-        <CardContent className="p-3 flex items-center justify-between">
-          <Link href={`/dashboard/people/${workspace?.organizer?.id}`}>
-          <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12">
-              <AvatarImage src={workspace?.organizer?.avatarUrl} />
-              <AvatarFallback>{workspace?.organizer?.fullName?.[0] || "O"}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-lg font-semibold">{workspace?.organizer?.fullName}</p>
-              <p className="text-muted-foreground text-sm">Organisateur</p>
-            </div>
-          </div>
-          </Link>
-          <Badge variant="outline" className="bg-green-50 text-green-700">
-            Organisation active
-          </Badge>
-        </CardContent>
-      </Card>
+     {/* Organisateur */}
+        <Card className="mb-4 shadow-sm rounded-xl">
+          <CardContent className="p-3 flex items-center justify-between">
+            {organizer ? (
+              <Link href={`/dashboard/people/${organizer.userId}`}>
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={organizer.avatarUrl} />
+                    <AvatarFallback>{organizer.fullName?.[0] || "O"}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-lg font-semibold">{organizer.fullName}</p>
+                    <p className="text-muted-foreground text-sm">Organisateur</p>
+                  </div>
+                </div>
+              </Link>
+            ) : (
+              <p className="text-muted-foreground">Aucun organisateur trouvé</p>
+            )}
+            <Badge variant="outline" className="bg-green-50 text-green-700">
+              Organisation active
+            </Badge>
+          </CardContent>
+        </Card>
 
       {/* Membres */}
       <Card className="mb-4 shadow-sm rounded-xl">
@@ -145,9 +172,9 @@ export default function OrganizationDetail() {
               <Eye className="mr-1 size-4" /> Voir
             </Button>
           </div>
-          {members?.length ? (
+          {filteredMembers.length ? (
             <div className="space-y-3">
-              {members.map((member: any) => (
+              {filteredMembers.map((member: any) => (
                 <div key={member.userId} className="flex items-center justify-between border-b pb-3 last:border-0">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-9 w-9">
@@ -169,10 +196,14 @@ export default function OrganizationDetail() {
               Aucun membre n'est enregistré pour cette organisation.
             </p>
           )}
+
         </CardContent>
       </Card>
 
+
+
       {/* Suppression */}
+      {isAdminOrOwner && (
       <Card className="shadow-sm border-red-200 rounded-xl">
         <CardContent className="p-3 text-center">
           <p className="text-sm mb-3">
@@ -180,16 +211,22 @@ export default function OrganizationDetail() {
           </p>
           <DeleteOrganizationButton workspace={workspace} />
         </CardContent>
-      </Card>
+      </Card> 
+      )}
 
       
       {/* Modal pour tester les button*/}
-      <Button variant="primary">
+     {isAdminOrOwner && ( 
+      <div>
+      {/* <Button variant="primary">
         Button1  
       </Button>
       <Button variant="secondary">
         Button2
-      </Button>
+      </Button> */}
+      </div>
+     )}
+{/* 
       <Button variant="ghost">
         Button3
       </Button>
@@ -204,7 +241,7 @@ export default function OrganizationDetail() {
       </Button>
       <Button variant="tertiary">
         Button7
-      </Button>
+      </Button> */}
       
 
       {/* Modal pour édition */}

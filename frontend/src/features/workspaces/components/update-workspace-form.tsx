@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { useUpdateWorkspace } from "../api/use-update-workspace";
 import { useGetWorkspaces } from "../api/use-get-workspaces";
 import { Loader, Save, User } from "lucide-react";
+import { useParams } from "next/navigation";
 
 interface Organization {
   id: number;
@@ -33,11 +34,15 @@ interface Props {
 }
 
 const EditOrganizationForm = ({ organization, onCancel, onSuccess }: Props) => {
-  const { workspaces } = useGetWorkspaces();
+  const { data: workspaces, isLoading, isError, error } = useGetWorkspaces();
   const safeWorkspaces = workspaces ?? [];
-  const { updateWorkspace, loading: loadingUpdate, error: errorUpdate } =
-    useUpdateWorkspace(safeWorkspaces);
+  const { mutateAsync: updateWorkspace, isPending: loadingUpdate } = useUpdateWorkspace();
 
+  // const { updateWorkspace, loading: loadingUpdate, error: errorUpdate } =
+    // useUpdateWorkspace(safeWorkspaces);
+  const params = useParams();
+  const id = Number(params.id);
+  
   const form = useForm<z.infer<typeof createWorkSpaceSchema>>({
     resolver: zodResolver(createWorkSpaceSchema),
     defaultValues: {
@@ -48,7 +53,7 @@ const EditOrganizationForm = ({ organization, onCancel, onSuccess }: Props) => {
 
   const onSubmit = async (values: z.infer<typeof createWorkSpaceSchema>) => {
     try {
-      await updateWorkspace(organization.id, values);
+      await updateWorkspace({ workspaceId: id, updatedData: values });
       onCancel?.();
       onSuccess?.();
     } catch (error) {
@@ -62,7 +67,7 @@ const EditOrganizationForm = ({ organization, onCancel, onSuccess }: Props) => {
     <Card className="w-full h-full border-none shadow-none">
       <CardHeader className="flex justify-center">
         <CardTitle className="text-xl font-bold justify-center">
-          Modifier l'organisation
+          Modifier l'organisation {organization.id}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -119,7 +124,7 @@ const EditOrganizationForm = ({ organization, onCancel, onSuccess }: Props) => {
               <Button
                 type="button"
                 size="lg"
-                variant="tertiary"
+                variant="destructive"
                 onClick={onCancel}
               >
                 Annuler

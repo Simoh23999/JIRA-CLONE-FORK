@@ -1,39 +1,63 @@
-"use client";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { Member, Organization, Organizer } from "@/components/organisation/types";
+import { useGetOrganizationMembers } from "./use-get-workspace";
 
-import { useState, useEffect } from "react";
-import { Organization,Member,Organizer } from "@/components/organisation/types";
-export const useGetWorkspaces = () => {
-  const [workspaces, setWorkspaces] = useState<Organization[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const fetchWorkspaces = async (): Promise<Organization[]> => {
+  const url = `http://localhost:9090/api/me/organizations`;
+  const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    // Simule un appel API avec délai
-    const timer = setTimeout(() => {
+  const orgRes = await axios.get(url, {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  const organizations = orgRes.data;
+
+  const result: Organization[] = await Promise.all(
+    organizations.map(async (org: any) => {
       try {
-        // Exemple de données simulées
-        const data: Organization[] = [
-          { id: 12, name: "Workspace 1", description: "Description 1" ,organizer: { id:2,fullName: "user 1", avatarUrl: "https://i.pravatar.cc/100?u=1" }},
-          { id: 2, name: "Workspace 2", description: "Description 2" ,organizer: { id:3,fullName: "User 2", avatarUrl: "https://i.pravatar.cc/100?u=2" }},
-          { id: 3, name: "Workspace 3", description: "Description 3" ,avatarUrl:"https://i.pravatar.cc/100?u=5",organizer: { id: 5,fullName: "user 3", avatarUrl: "https://i.pravatar.cc/100?u=3" }},
-          {id:4 ,name:"Workspace 4" ,description:"Description 4" ,organizer:{id:7,fullName:"ismail nid"}},
-          { id: 5, name: "Workspace 5", description: "Description 5" ,organizer: { id:2,fullName: "user 4", avatarUrl: "https://i.pravatar.cc/100?u=1" }},
-          { id: 6, name: "Workspace 6", description: "Description 6" ,organizer: { id:3,fullName: "user 5", avatarUrl: "https://i.pravatar.cc/100?u=2" }},
-          { id: 7, name: "Workspace 7", description: "Description 7" ,avatarUrl:"https://i.pravatar.cc/100?u=5",organizer: { id: 5,fullName: "user 6", avatarUrl: "https://i.pravatar.cc/100?u=3" }},
-          {id:8,name:"Workspace 8" ,description:"Description 8" ,organizer:{id:7,fullName:"ismail nid"}}
-        
-        ];
+        const membersData = await useGetOrganizationMembers(org.id);
+        const owner = membersData?.find(
+          (member: Member) => member.username === org.ownerUsername
+        );
 
-        setWorkspaces(data);
-        setLoading(false);
-      } catch (err) {
-        setError("Erreur lors du chargement des organisations");
-        setLoading(false);
+        const organizer: Organizer = {
+          id: owner?.userId || 0,
+          fullName: owner?.fullName || org.ownerUsername || "Inconnu",
+          avatarUrl: owner?.avatarUrl || `https://i.pravatar.cc/100?u=${owner?.userId}`,
+        };
+
+        return {
+          id: org.id,
+          name: org.name,
+          description: org.description,
+          organizer,
+        };
+      } catch (e) {
+        return {
+          id: org.id,
+          name: org.name,
+          description: org.description,
+          organizer: {
+            id: 0,
+            fullName: "Organisateur not found",
+            avatarUrl: `https://i.pravatar.cc/100?u=${org.id}`,
+          },
+        };
       }
-    }, 1000);
+    })
+  );
 
-    return () => clearTimeout(timer);
-  }, []);
+  return result;
+};
 
-  return { workspaces, loading, error };
+export const useGetWorkspaces = () => {
+  return useQuery({
+    queryKey: ["workspaces"],
+    queryFn: fetchWorkspaces,
+    staleTime: 5 * 60 * 1000, // cache valide 5 minutes
+  });
 };

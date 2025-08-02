@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useState } from "react";
 import {
   Building,
   CheckCircle,
@@ -25,104 +25,125 @@ import {
 
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
-import { redirect } from "next/dist/server/api-utils";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
-
-// Définir le type du contenu du token
 type JwtPayload = {
-  name: string;
   email: string;
-  exp?: number;
+  exp: number;
+  iat: number;
+  roles: string[];
+  sub: string;
+  username: string;
 };
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
-  const [user, setUser] = React.useState({
+  const pathname = usePathname();
+  const [user, setUser] = useState({
     name: "Utilisateur",
     email: "non défini",
     avatar: "/avatars/avatar.jpg",
   });
+  const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
 
-  React.useEffect(() => {
+  useEffect(() => {
     try {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) {
-        console.warn(
-          "Aucun token trouvé, redirection vers la page de connexion",
-        );
         router.push("/auth");
         return;
       }
-      if (token) {
-        const decoded = jwtDecode<JwtPayload>(token);
-        if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-          console.warn("Token expiré");
-          localStorage.removeItem("token");
-          // Rediriger vers la page de connexion
-          router.push("/auth");
-        } else {
-          setUser((prev) => ({
-            ...prev,
-            name: decoded.name,
-            email: decoded.email,
-          }));
-        }
+      const decoded = jwtDecode<JwtPayload>(token);
+      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        localStorage.removeItem("token");
+        router.push("/auth");
+      } else {
+        setUser((prev) => ({
+          ...prev,
+          name: decoded.username,
+          email: decoded.email,
+        }));
       }
     } catch (err) {
       console.error("Erreur lors du décodage du token :", err);
     }
-  }, []);
+  }, [router]);
 
-
-const data = {
-  user,
-  teams: [
-    { name: "DEVPFA-SQUAD1", logo: Group, plan: "Amina" },
-    { name: "team1234", logo: Group, plan: "Mohamed" },
-  ],
-  navMain: [
-    { title: "Accueil", url: "/", icon: Home, isActive: false, items: [] },
-    {
-      title: "Organisations",
-      url: "/organisations",
-      icon: Building,
-      isActive: false,
-      items: [],
-    },
-    {
-      title: "Mes tâches",
-      url: "/tasks",
-      icon: CheckCircle,
-      isActive: false,
-      items: [],
-    },
-    {
-      title: "Membres",
-      url: "/members",
-      icon: Users,
-      isActive: false,
-      items: [],
-    },
-    { title: "Paramètres", url: "/settings", icon: Settings2, isActive: false },
-  ],
-  projects: [{ name: "Clone Jira", url: "#", icon: Frame }],
-};
+  const data = {
+    user,
+    teams: [
+      { name: "DEVPFA-SQUAD1", logo: Group, plan: "Amina" },
+      { name: "team1234", logo: Group, plan: "mohamed" },
+    ],
+    navMain: [
+      { title: "Home", url: "/", icon: Home, isActive: false, items: [] },
+      {
+        title: "Organisations",
+        url: "/organisations",
+        icon: Building,
+        isActive: false,
+        items: [],
+      },
+      {
+        title: "My Tasks",
+        url: "/tasks",
+        icon: CheckCircle,
+        isActive: false,
+        items: [],
+      },
+      {
+        title: "Members",
+        url: "/members",
+        icon: Users,
+        isActive: false,
+        items: [],
+      },
+      { title: "Settings", url: "/settings", icon: Settings2, isActive: false },
+    ],
+    projects: [{ name: "jira clone", url: "#", icon: Frame }],
+  };
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <div className="flex items-center justify-center py-4">
-          <Image src="/logo.svg" alt="logo" width={120} height={40} />
+        <div
+          className="flex items-center justify-center py-1 pr-0 transition-opacity duration-300"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {isHovered ? (
+            <video
+              src="/TaskFlow.mp4"
+              className="w-20  à h-10 object-cover rounded-full transition-all duration-300"
+              muted
+              autoPlay
+              loop
+              playsInline
+            />
+          ) : (
+            <Image
+              src="/TaskFlow.png"
+              alt="logo"
+              width={40}
+              height={90}
+              className="transition-all duration-300"
+            />
+          )}
         </div>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
+
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} currentPath={pathname} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );

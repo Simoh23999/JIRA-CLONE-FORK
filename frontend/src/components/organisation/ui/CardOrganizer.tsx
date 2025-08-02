@@ -23,7 +23,7 @@ export default function CardOrganizer({ org }: { org: Organization }) {
           </AvatarFallback>
         </Avatar>
         <span className="text-xs text-gray-600">
-          {org.organizer?.fullName || "Unknown Organizer"}
+          {org?.organizer?.fullName || "No Organizer"}
         </span>
       </Link>
     </div>

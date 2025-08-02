@@ -5,7 +5,7 @@ export default function IntroLoader() {
     <div className="min-h-screen flex items-center justify-center bg-white animate-fade-in">
       <div className="flex flex-col items-center gap-4">
         <Image
-          src="/logo.svg" // ton logo (ou remplace par image png/jpg)
+          src="/logo.svg" 
           alt="Logo"
           width={80}
           height={80}

@@ -6,6 +6,7 @@ export interface Organizer {
 export interface Member {
   userId: number;
   fullName: string;
+  username: string;
   email: string;
   role: string;
   avatarUrl?: string;

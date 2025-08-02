@@ -23,7 +23,7 @@ interface Props {
   onCancel?: () => void;
 }
 
-const CreateWorkspaceForm = ({ onCancel }: Props) => {
+const CreateWorkspaceForm =  ({ onCancel }: Props) => {
   const form = useForm<z.infer<typeof createWorkSpaceSchema>>({
     resolver: zodResolver(createWorkSpaceSchema),
     defaultValues: {
@@ -31,12 +31,14 @@ const CreateWorkspaceForm = ({ onCancel }: Props) => {
       description: "",
     },
   });
-
-  const { workspaces } = useGetWorkspaces(); 
+  const createWorkspaceMutation = useCreateWorkspace();
+  // const { workspaces } =  useGetWorkspaces(); 
+   const workspaces= useGetWorkspaces(); // Récupérer les organisations existantes
 
   const onSubmit = async (values: z.infer<typeof createWorkSpaceSchema>) => {
     try {
-      await useCreateWorkspace(values);
+      // await useCreateWorkspace(values);
+      createWorkspaceMutation.mutate(values);
       form.reset();
       handleCancel();
     } catch (error) {
@@ -47,10 +49,13 @@ const CreateWorkspaceForm = ({ onCancel }: Props) => {
   };
 
   const handleCancel = () => {
-    if (workspaces && workspaces.length > 0) {
+   
+    if (workspaces) {
+    // if(true) {
       onCancel?.(); // Ferme le formulaire si au moins une organisation existe
+
     } else {
-	  toast.error("Vous devez créer au moins une organisation avant de fermer.");
+	  toast.error(`Vous devez créer au moins une organisation avant de fermer.`);
     }
   };
 

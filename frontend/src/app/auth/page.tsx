@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition  } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import AuthContainer from "../../components/auth/AuthContainer";
 import AuthCard from "../../components/auth/AuthCard";
 import LoginForm from "../../components/auth/LoginForm";
 import SignupForm from "../../components/auth/SignupForm";
+import RequireAuth from "@/components/RequireAuth";
 import { loginSchema, signupSchema } from "./validations/auth";
 import { ZodObject, ZodRawShape } from "zod";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "../../types/jwt";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9090";
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<"connexion" | "inscription">(
     "connexion",
@@ -37,9 +39,22 @@ export default function AuthPage() {
     confirmPassword?: string;
   }>({});
 
-  // const [checking, setChecking] = useState(true);
+  const [checking, setChecking] = useState(true);
   const router = useRouter();
 
+  
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/dashboard");
+    } else {
+      setChecking(false);
+    }
+  }, [router]);
+
+  if (checking) {
+    return <RequireAuth> </RequireAuth>;
+  }
   const validateField = (
     schema: ZodObject<ZodRawShape>,
     fieldName: string,
@@ -74,31 +89,23 @@ export default function AuthPage() {
       return;
     }
 
+
     startTransition(async () => {
       try {
         const response = await axios.post(
-          "http://localhost:9090/api/auth/authenticate",
+          `${BASE_URL}/api/auth/authenticate`,
           { email, password },
           {
             headers: { "Content-Type": "application/json" },
-          },
+          }
         );
 
         const token = response.data?.token;
-        const decoded = jwtDecode<JwtPayload>(token);
-        console.log("data:", decoded);
         if (token) {
-          // user.email = decoded.email;
-
           if (rememberMe) {
             localStorage.setItem("token", token);
-            console.log("token:", token);
-
-            // localStorage.setItem("token", "asasas");
           } else {
             sessionStorage.setItem("token", token);
-            console.log("token:", token);
-            console.log("user:", response.data.user);
           }
         }
 
@@ -133,16 +140,16 @@ export default function AuthPage() {
       setSignupErrors(formatted);
       return;
     }
-    startTransition(async () => {
+        startTransition(async () => {
       try {
-        await axios.post(
+        const response = await axios.post(
           "http://localhost:9090/api/auth/register",
           { fullName, email, password },
           {
             headers: { "Content-Type": "application/json" },
-          },
+          }
         );
-
+    
         router.push("/auth"); // // Rediriger vers login page (a discuter)
       } catch (err: any) {
         const message =
@@ -240,5 +247,6 @@ export default function AuthPage() {
         )}
       </AuthCard>
     </AuthContainer>
+    
   );
 }

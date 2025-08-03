@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
@@ -17,6 +18,10 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import RequireAuth from "@/components/RequireAuth";
+import CreateWorkspaceModal from "@/features/workspaces/components/create-workspace-modal";
+import { useGetWorkspaces } from "@/features/workspaces/api/use-get-workspaces";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 
 function formatPath(path: string) {
   return path
@@ -30,16 +35,26 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname(); // ex: "/dashboard/tasks"
-  const segments = pathname.split("/").filter(Boolean); // ["dashboard", "tasks"]
-
+  const pathname = usePathname();
+  const segments = pathname.split("/").filter(Boolean);
+  const { data: workspaces, isLoading, isError, error } = useGetWorkspaces();
+  
   const currentPage =
     segments.length > 1
       ? formatPath(segments[segments.length - 1])
       : "Dashboard";
 
+  const [open, setOpen] = useState(false);
+  const canClose = !!(workspaces && workspaces.length > 0);
+  useEffect(() => {
+    if (!isLoading && (!workspaces || workspaces.length === 0)) {
+      setOpen(true);
+    }
+  }, [isLoading, workspaces]);
+
   return (
     <RequireAuth>
+      <CreateWorkspaceModal open={open} onOpenChange={setOpen} canClose={canClose} />
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>

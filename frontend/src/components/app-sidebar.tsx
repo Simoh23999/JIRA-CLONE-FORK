@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  Building,
   CheckCircle,
   Frame,
   Group,
@@ -26,14 +27,10 @@ import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 // import { useUser } from "@/app/context/UserContext";
 
-// Définir le type du contenu du token
-// type JwtPayload = {
-//   name: string;
-//   email: string;
-//   exp?: number;
-// };
 type JwtPayload = {
   email: string;
   exp: number;
@@ -45,78 +42,37 @@ type JwtPayload = {
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
-  // const { user } = useUser();
   const [user, setUser] = useState({
     name: "Utilisateur",
     email: "non défini",
-    // avatar: "/avatars/avatar.jpg",
+    avatar: "/avatars/avatar.jpg",
   });
+  const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
-  const [refreshUser, setRefreshUser] = useState(false);
 
   useEffect(() => {
-    //   const fetchUserData = async () => {
-    //   const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-
-    //   if (!token) {
-    //     console.warn("Aucun token trouvé, redirection vers la page de connexion");
-    //     router.push("/auth");
-    //     return;
-    //   }
-
-    //   try {
-    //     const response = await axios.get("http://localhost:9090/api/me", {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     });
-
-    //     const userData = response.data;
-
-    //     setUser({
-    //       name: userData.username,
-    //       email: userData.email,
-    //     });
-
-    //     console.log("Données utilisateur à jour:", userData);
-    //   } catch (error) {
-    //     console.error("Erreur lors de la récupération des infos utilisateur:", error);
-    //     router.push("/auth");
-    //   }
-    // };
-
-    // fetchUserData();
     try {
       const token =
         localStorage.getItem("token") || sessionStorage.getItem("token");
-      console.log("Token récupéré:", token);
       if (!token) {
-        console.warn(
-          "Aucun token trouvé, redirection vers la page de connexion",
-        );
         router.push("/auth");
         return;
       }
-      if (token) {
-        const decoded = jwtDecode<JwtPayload>(token);
-        if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-          console.warn("Token expiré");
-          localStorage.removeItem("token");
-          // Rediriger vers la page de connexion
-          router.push("/auth");
-        } else {
-          setUser((prev) => ({
-            ...prev,
-            name: decoded.username,
-            email: decoded.email,
-          }));
-          console.log("Token valide, utilisateur:", decoded);
-        }
+      const decoded = jwtDecode<JwtPayload>(token);
+      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        localStorage.removeItem("token");
+        router.push("/auth");
+      } else {
+        setUser((prev) => ({
+          ...prev,
+          username: decoded.username,
+          email: decoded.email,
+        }));
       }
     } catch (err) {
       console.error("Erreur lors du décodage du token :", err);
     }
-  }, [router, refreshUser]);
+  }, [router]);
 
   const data = {
     user,
@@ -126,6 +82,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     ],
     navMain: [
       { title: "Home", url: "/", icon: Home, isActive: false, items: [] },
+      {
+        title: "Organisations",
+        url: "/organisations",
+        icon: Building,
+        isActive: false,
+        items: [],
+      },
       {
         title: "My Tasks",
         url: "/tasks",
@@ -148,18 +111,42 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <div className="flex items-center justify-center py-4">
-          <Image src="/logo.svg" alt="logo" width={120} height={40} />
+        <div
+          className="flex items-center justify-center py-1 pr-0 transition-opacity duration-300"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {isHovered ? (
+            <video
+              src="/TaskFlow.mp4"
+              className="w-20  à h-10 object-cover rounded-full transition-all duration-300"
+              muted
+              autoPlay
+              loop
+              playsInline
+            />
+          ) : (
+            <Image
+              src="/TaskFlow.png"
+              alt="logo"
+              width={85}
+              height={85}
+              className="transition-all duration-300"
+            />
+          )}
         </div>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
+
       <SidebarContent>
         <NavMain items={data.navMain} currentPath={pathname} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );

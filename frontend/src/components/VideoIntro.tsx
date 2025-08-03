@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 type Props = {
   onFinished: () => void;
@@ -13,23 +13,23 @@ export default function VideoIntro({ onFinished }: Props) {
     const video = videoRef.current;
     if (video) {
       video.play();
-      video.addEventListener("ended", onFinished);
+      // Ne pas utiliser `ended` si on boucle
+      // video.addEventListener("ended", onFinished);
     }
 
-    return () => {
-      video?.removeEventListener("ended", onFinished);
-    };
-  }, [onFinished]);
+    // Pas besoin de cleanup ici si on ne gère pas l'événement "ended"
+  }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+    <div className="fixed inset-0 z-100 flex items-center justify-center  ">
       <video
         ref={videoRef}
-        src="/introLogo.mp4" // place ta vidéo ici dans public/
-        className="w-full h-full object-cover"
+        src="/TaskFlow2.mp4"
+        className="w-35 h-20 object-cover"
         muted
         autoPlay
         playsInline
+        loop 
       />
     </div>
   );

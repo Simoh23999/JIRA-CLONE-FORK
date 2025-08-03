@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import RequireAuth from "@/components/RequireAuth";
+import CreateWorkspaceForm from "@/features/workspaces/components/create-workspace-form";
 
 export default function DashboardPage() {
   const router = useRouter();

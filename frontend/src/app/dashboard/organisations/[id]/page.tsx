@@ -204,7 +204,7 @@ if (token && members) {
 
       {/* Suppression */}
       {isAdminOrOwner && (
-      <Card className="shadow-sm border-red-200 rounded-xl">
+      <Card className="shadow-sm border-[#d6e6f2] rounded-xl">
         <CardContent className="p-3 text-center">
           <p className="text-sm mb-3">
             Toutes les informations liées à cette organisation seront supprimées.
@@ -213,35 +213,6 @@ if (token && members) {
         </CardContent>
       </Card> 
       )}
-
-      
-      {/* Modal pour tester les button*/}
-     {isAdminOrOwner && ( 
-      <div>
-      {/* <Button variant="primary">
-        Button1  
-      </Button>
-      <Button variant="secondary">
-        Button2
-      </Button> */}
-      </div>
-     )}
-{/* 
-      <Button variant="ghost">
-        Button3
-      </Button>
-      <Button variant="destructive">
-        Button4
-      </Button>
-      <Button variant="outline">
-        Button5
-      </Button>
-      <Button variant="muted">
-        Button6
-      </Button>
-      <Button variant="tertiary">
-        Button7
-      </Button> */}
       
 
       {/* Modal pour édition */}

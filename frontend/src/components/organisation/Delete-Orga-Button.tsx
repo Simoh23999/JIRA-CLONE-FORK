@@ -11,11 +11,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+
 import { Trash2 } from "lucide-react";
 import React from "react";
 import { useParams } from "next/navigation";
 import { useDeleteOrganization } from "@/features/workspaces/api/use-delete-workspace";
+import { Button } from "../ui/button";
 
 
 export default function DeleteOrganizationButton({ workspace }: { workspace: any }) {

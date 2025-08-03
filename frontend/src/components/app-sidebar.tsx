@@ -62,7 +62,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       } else {
         setUser((prev) => ({
           ...prev,
-          name: decoded.username,
+          username: decoded.username,
           email: decoded.email,
         }));
       }
@@ -126,8 +126,8 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             <Image
               src="/TaskFlow.png"
               alt="logo"
-              width={40}
-              height={90}
+              width={85}
+              height={85}
               className="transition-all duration-300"
             />
           )}

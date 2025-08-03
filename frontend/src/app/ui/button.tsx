@@ -18,6 +18,8 @@ const buttonVariants = cva(
         secondary: "bg-[#5AC9F1] text-[#005BAC] hover:bg-[#5AC9F1]/80",
         ghost:
           "border-transparent shadow-none text-[#005BAC] hover:bg-[#5AC9F1]/20",
+        suprimebt:
+          "border-transparent shadow-none text-[#005BAC] hover:bg-[#5AC9F1]/20",
         muted: "bg-[#F5F5F5] text-[#3F3F3F] hover:bg-[#F5F5F5]/80",
         tertiary:
           "bg-[#E13B7F]/10 text-[#E13B7F] border border-transparent hover:bg-[#E13B7F]/20",

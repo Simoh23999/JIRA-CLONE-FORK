@@ -21,15 +21,15 @@ export default function VideoIntro({ onFinished }: Props) {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center ">
+    <div className="fixed inset-0 z-100 flex items-center justify-center  ">
       <video
         ref={videoRef}
         src="/TaskFlow2.mp4"
-        className="w-26 h-20 object-cover"
+        className="w-35 h-20 object-cover"
         muted
         autoPlay
         playsInline
-        loop // ⬅️ Vidéo se répète automatiquement
+        loop 
       />
     </div>
   );

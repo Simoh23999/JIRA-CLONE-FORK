@@ -109,14 +109,14 @@ const CreateWorkspaceForm =  ({ onCancel }: Props) => {
         </div>
 
         <div className="flex items-center justify-between mt-7">
-          <Button type="submit" size="lg" variant="ghost">
+          <Button type="submit" size="lg" variant="tertiary">
             Créer l'organisation
           </Button>
 
           <Button
             type="button"
             size="lg"
-            variant="tertiary"
+            variant="ghost"
             onClick={handleCancel}
           >
             Annuler

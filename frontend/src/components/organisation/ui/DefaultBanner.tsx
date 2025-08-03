@@ -2,7 +2,7 @@ import React from "react";
 
 export default function DefaultBanner() {
   return (
-    <div className="relative w-full h-48 rounded-xl overflow-hidden shadow-sm bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
+    <div className="relative w-full h-48 rounded-xl overflow-hidden shadow-sm bg-gradient-to-r from-[#769fcd] via-[#d6e6f2] to-[#b9d7ea]">
       <div className="absolute inset-0">
         <div className="absolute top-10 left-20 w-32 h-32 bg-white/10 rounded-full blur-md"></div>
         <div className="absolute top-60 right-10 w-24 h-24 bg-white/10 rounded-full blur-md"></div>

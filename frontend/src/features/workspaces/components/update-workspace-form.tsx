@@ -42,7 +42,7 @@ const EditOrganizationForm = ({ organization, onCancel, onSuccess }: Props) => {
     // useUpdateWorkspace(safeWorkspaces);
   const params = useParams();
   const id = Number(params.id);
-  
+
   const form = useForm<z.infer<typeof createWorkSpaceSchema>>({
     resolver: zodResolver(createWorkSpaceSchema),
     defaultValues: {
@@ -113,7 +113,7 @@ const EditOrganizationForm = ({ organization, onCancel, onSuccess }: Props) => {
               <Button
                 type="submit"
                 size="lg"
-                variant="ghost"
+                variant="primary"
                 disabled={loadingUpdate}
               >
                  {loadingUpdate ? <Loader></Loader>: ""}
@@ -124,7 +124,7 @@ const EditOrganizationForm = ({ organization, onCancel, onSuccess }: Props) => {
               <Button
                 type="button"
                 size="lg"
-                variant="destructive"
+                variant="ghost"
                 onClick={onCancel}
               >
                 Annuler

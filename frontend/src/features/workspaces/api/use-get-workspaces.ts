@@ -20,7 +20,7 @@ const fetchWorkspaces = async (): Promise<Organization[]> => {
     organizations.map(async (org: any) => {
       try {
         const membersData = await useGetOrganizationMembers(org.id);
-        const owner = membersData?.find(
+        const owner = membersData.data?.find(
           (member: Member) => member.username === org.ownerUsername
         );
 
@@ -42,9 +42,8 @@ const fetchWorkspaces = async (): Promise<Organization[]> => {
           name: org.name,
           description: org.description,
           organizer: {
-            id: 0,
-            fullName: "Organisateur not found",
-            avatarUrl: `https://i.pravatar.cc/100?u=${org.id}`,
+            id: org.id,
+            fullName: org.ownerUsername ,
           },
         };
       }

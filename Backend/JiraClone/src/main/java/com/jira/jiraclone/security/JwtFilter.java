@@ -4,6 +4,7 @@ import com.jira.jiraclone.repositories.UserRepository;
 import com.jira.jiraclone.services.JwtService;
 import com.jira.jiraclone.entities.User;
 import com.jira.jiraclone.entities.UserRole;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.security.SignatureException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -36,36 +38,38 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        try {
+            String authHeader = request.getHeader("Authorization");
+            String token = null;
+            String email = null;
 
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        String email = null;
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+                email = jwtService.extractEmail(token);
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            email = jwtService.extractEmail(token);
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    User user = userRepository.findByEmail(email).orElse(null);
+                    if (user != null) {
+                        UserPrincipal userPrincipal = new UserPrincipal(user);
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                // Option 1: Validation complète avec base de données (recommandé pour la sécurité)
-                User user = userRepository.findByEmail(email).orElse(null);
-                if (user != null) {
-                    UserPrincipal userPrincipal = new UserPrincipal(user);
-
-                    if (jwtService.validateToken(token, userPrincipal)) {
-                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                                userPrincipal,
-                                null,
-                                userPrincipal.getAuthorities()
-                        );
-                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                        if (jwtService.validateToken(token, userPrincipal)) {
+                            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                    userPrincipal,
+                                    null,
+                                    userPrincipal.getAuthorities()
+                            );
+                            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authToken);
+                        }
                     }
                 }
-
             }
-        }
 
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+        } catch (JwtException ex) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Token invalide ou signature incorrecte\", \"details\": \"" + ex.getMessage() + "\"}");
+        }
     }
 }

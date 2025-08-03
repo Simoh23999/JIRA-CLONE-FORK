@@ -48,7 +48,7 @@ public class JwtService {
                 .add(claims)
                 .subject(userPrincipal.getEmail()) // L'email reste le subject principal
                 .issuedAt(new java.util.Date(System.currentTimeMillis()))
-                .expiration(new java.util.Date(System.currentTimeMillis() + 1000*60*15))
+                .expiration(new java.util.Date(System.currentTimeMillis() + 1000*60*60*2))
                 .and()
                 .signWith(getKey())
                 .compact();

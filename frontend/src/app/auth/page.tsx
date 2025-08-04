@@ -144,7 +144,7 @@ export default function AuthPage() {
       try {
         const response = await axios.post(
           "http://localhost:9090/api/auth/register",
-          { fullName, email, password },
+          { username: fullName, email, password },
           {
             headers: { "Content-Type": "application/json" },
           }

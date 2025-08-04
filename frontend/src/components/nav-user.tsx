@@ -39,6 +39,7 @@ export function NavUser({
 
   function Logout() {
     localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
   }
 
   // Si pas de user, on peut afficher un placeholder ou rien

@@ -11,7 +11,7 @@ export const useCreateWorkspace = () => {
 
   return useMutation({
     mutationFn: async (values: z.infer<typeof createWorkSpaceSchema>) => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const response = await axios.post(`${baseURL}/organizations`, values, {
         headers: {
           "Content-Type": "application/json",

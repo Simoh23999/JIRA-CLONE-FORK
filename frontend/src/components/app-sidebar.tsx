@@ -61,6 +61,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       const decoded = jwtDecode<JwtPayload>(token);
       if (decoded.exp && decoded.exp * 1000 < Date.now()) {
         localStorage.removeItem("token");
+        sessionStorage.removeItem("token")
         router.push("/auth");
       } else {
         setUser((prev) => ({

@@ -5,7 +5,7 @@ import { useGetOrganizationMembers } from "./use-get-workspace";
 
 const fetchWorkspaces = async (): Promise<Organization[]> => {
   const url = `http://localhost:9090/api/me/organizations`;
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
   const orgRes = await axios.get(url, {
     headers: {

@@ -8,7 +8,7 @@ import { toast } from "sonner";
 // Fonction pour supprimer une organisation
 const deleteOrganization = async (id: number): Promise<any> => {
   try {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     if (!token) {
       toast.error("Token d'authentification manquant.");
       return false;

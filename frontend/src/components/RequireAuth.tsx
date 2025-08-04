@@ -26,6 +26,7 @@ export default function RequireAuth({ children }: Props) {
     if (parts.length !== 3) {
       console.warn("Format de token invalide");
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       router.push("/auth");
       return;
     }
@@ -36,6 +37,7 @@ export default function RequireAuth({ children }: Props) {
       if (decoded.exp && decoded.exp * 1000 < Date.now()) {
         console.warn("Token expiré");
         localStorage.removeItem("token");
+        sessionStorage.removeItem("token")
         router.push("/auth");
       } else {
          // setUser((prev) => ({
@@ -48,6 +50,7 @@ export default function RequireAuth({ children }: Props) {
     } catch (decodeError) {
       console.error("Erreur lors du décodage du token :", decodeError);
       localStorage.removeItem("token");
+      sessionStorage.removeItem("token")
       router.push("/auth");
     }
   }

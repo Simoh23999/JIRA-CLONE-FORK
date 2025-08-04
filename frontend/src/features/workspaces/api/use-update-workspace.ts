@@ -16,7 +16,7 @@ export const useUpdateWorkspace = () => {
       workspaceId: number | string;
       updatedData: Partial<Organization>;
     }) => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const url = `${baseURL}/organizations/${workspaceId}`;
       const response = await axios.put(url, updatedData, {
         headers: {

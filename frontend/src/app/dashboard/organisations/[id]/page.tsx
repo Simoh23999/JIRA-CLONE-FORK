@@ -45,7 +45,7 @@ const organizer = members?.find((m) => m.role === "OWNER") || null;
 // Filtrer les autres membres (exclure l'organisateur)
 const filteredMembers = members?.filter((m) => m.role !== "OWNER") || [];
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
   if (!token) {
     router.push("/auth");
     return null;
@@ -57,6 +57,7 @@ if (token && members) {
   if (decoded.exp && decoded.exp * 1000 < Date.now()) {
           console.warn("Token expiré");
           localStorage.removeItem("token");
+          sessionStorage.removeItem("token")
           // Rediriger vers la page de connexion
           router.push("/auth");
         } else {

@@ -11,7 +11,7 @@ export interface Member {
 }
 
 export const fetchMembers = async (orgId: number): Promise<{ members: Member[] }> => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
   const res = await axios.get(`${baseURL}/organizations/${orgId}/members`, {
     headers: {
       Authorization: `Bearer ${token}`,

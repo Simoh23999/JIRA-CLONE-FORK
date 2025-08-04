@@ -57,6 +57,7 @@ export function AppSidebarV2(props: React.ComponentProps<typeof Sidebar>) {
         if (decoded.exp && decoded.exp * 1000 < Date.now()) {
           console.warn("Token expiré");
           localStorage.removeItem("token");
+          sessionStorage.removeItem("token")
           // Rediriger vers la page de connexion
           router.push("/auth");
         } else {

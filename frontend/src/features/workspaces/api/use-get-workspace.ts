@@ -9,7 +9,7 @@ export const useGetOrganization = (id: number | string) => {
   return useQuery<Organization>({
     queryKey: ["workspaces", id],
     queryFn: async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const response = await axios.get(`${baseURL}/organizations/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -26,7 +26,7 @@ export const useGetOrganizationMembers = (id: number | string) => {
   return useQuery<Member[]>({
     queryKey: ["organization-members", id],
     queryFn: async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const response = await axios.get(`${baseURL}/api/organizations/${id}/members`, {
         headers: {
           Authorization: `Bearer ${token}`,

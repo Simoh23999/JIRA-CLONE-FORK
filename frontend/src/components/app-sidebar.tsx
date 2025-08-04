@@ -27,8 +27,8 @@ import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
+// import { useRouter } from "next/navigation";
+// import { usePathname } from "next/navigation";
 // import { useUser } from "@/app/context/UserContext";
 
 type JwtPayload = {

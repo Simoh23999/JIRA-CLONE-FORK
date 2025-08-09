@@ -22,4 +22,7 @@ public class Organization {
 
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
     private List<Membership> memberships; // List of memberships in the organization
+
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Project> projects; // List of projects in the organization
 }

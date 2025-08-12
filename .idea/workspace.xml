@@ -40,6 +40,10 @@
     &quot;accountId&quot;: &quot;12dd1dee-3122-420e-ad97-bbaf47042c66&quot;
   }
 }</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -60,7 +64,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Spring Boot.JiraCloneApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/organizations-features&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/refresh-token&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/nidla/Desktop/Stage/M2aSoft/Nouveau dossier/JIRA-CLONE&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -109,6 +113,9 @@
       <workItem from="1752697058049" duration="256000" />
       <workItem from="1752697396092" duration="148000" />
       <workItem from="1753655467197" duration="2414000" />
+      <workItem from="1754467484507" duration="218000" />
+      <workItem from="1754467726170" duration="571000" />
+      <workItem from="1754468325314" duration="323000" />
     </task>
     <servers />
   </component>

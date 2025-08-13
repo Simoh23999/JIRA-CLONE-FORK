@@ -5,6 +5,11 @@ import PasswordField from "@/components/auth/ui/PasswordField";
 import FormDivider from "@/components/auth/ui/FormDivider";
 import AuthButton from "@/components/auth/ui/AuthButton";
 import styles from "./styles/LoginForm.module.css";
+import {
+  ServerErrorDisplay,
+  translateErrorMessage,
+  SimpleErrorText,
+} from "@/components/ErrorDisplay";
 
 import { Mail } from "lucide-react";
 
@@ -17,6 +22,8 @@ type LoginFormProps = {
     email?: string;
     password?: string;
   };
+  serverError: string | null;
+  onDismiss: () => void;
   onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRememberMeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -26,6 +33,7 @@ type LoginFormProps = {
   onForgotPassword?: () => void;
   onEmailBlur: () => void;
   onPasswordBlur: () => void;
+  submitButtonState: boolean;
 };
 
 export default function LoginForm({
@@ -34,6 +42,7 @@ export default function LoginForm({
   rememberMe,
   showPassword,
   errors,
+  serverError,
   onEmailChange,
   onPasswordChange,
   onRememberMeChange,
@@ -42,9 +51,12 @@ export default function LoginForm({
   onForgotPassword,
   onEmailBlur,
   onPasswordBlur,
+  onDismiss,
+  submitButtonState,
 }: LoginFormProps) {
   return (
     <form className="space-y-6" onSubmit={onSubmit}>
+      <ServerErrorDisplay error={serverError} onDismiss={onDismiss} />
       {/* Email input */}
       <InputField
         type="email"
@@ -89,9 +101,19 @@ export default function LoginForm({
           Mot de passe oublié ?
         </button>
       </div>
-
+      {/* <ServerErrorDisplay
+    error={serverError} 
+    onDismiss={onDismiss} 
+        /> */}
       {/* login button */}
-      <AuthButton value="Se connecter" style={styles.bg_loginButton_blue} />
+      {/* <AuthButton value="Se connecter" style={styles.bg_loginButton_blue} /> */}
+      <AuthButton
+        value="Se connecter"
+        loadingValue="Connexion..."
+        style={styles.bg_loginButton_blue}
+        isLoading={submitButtonState}
+        disabled={submitButtonState}
+      />
 
       {/* divider */}
       <FormDivider />

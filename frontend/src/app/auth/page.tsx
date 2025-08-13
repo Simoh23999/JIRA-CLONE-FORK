@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition  } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import AuthContainer from "../../components/auth/AuthContainer";
@@ -12,6 +12,13 @@ import { loginSchema, signupSchema } from "./validations/auth";
 import { ZodObject, ZodRawShape } from "zod";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "../../types/jwt";
+import {
+  ServerErrorDisplay,
+  translateErrorMessage,
+  SimpleErrorText,
+} from "@/components/ErrorDisplay";
+import { useToast } from "../../hooks/useToast";
+import { Toast } from "../../components/ui/Toast";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9090";
 export default function AuthPage() {
@@ -27,7 +34,10 @@ export default function AuthPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const [isPending, startTransition] = useTransition();
-  const [serverError, setServerError] = useState<string | null>(null);
+  const [loginServerError, setloginServerError] = useState<string | null>(null);
+  const [signUpServerError, setsignUpServerError] = useState<string | null>(
+    null,
+  );
   const [loginErrors, setLoginErrors] = useState<{
     email?: string;
     password?: string;
@@ -42,7 +52,10 @@ export default function AuthPage() {
   const [checking, setChecking] = useState(true);
   const router = useRouter();
 
-  
+  const [isLoginSubmitting, setisLoginSubmitting] = useState(false);
+  const [isSignUpSubmitting, setisSignUpSubmitting] = useState(false);
+  const { toast, showToast } = useToast();
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -78,6 +91,8 @@ export default function AuthPage() {
   const LoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoginErrors({});
+    setloginServerError(null);
+    setisLoginSubmitting(true);
     const result = loginSchema.safeParse({ email, password });
 
     if (!result.success) {
@@ -86,9 +101,9 @@ export default function AuthPage() {
         formatted[i.path[0] as string] = i.message;
       });
       setLoginErrors(formatted);
+      setisLoginSubmitting(false);
       return;
     }
-
 
     startTransition(async () => {
       try {
@@ -97,7 +112,7 @@ export default function AuthPage() {
           { email, password },
           {
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
 
         const token = response.data?.token;
@@ -115,7 +130,16 @@ export default function AuthPage() {
           err.response?.data?.message ||
           err.message ||
           "Une erreur est survenue. Veuillez réessayer.";
-        setServerError(message);
+        const Message = translateErrorMessage(message);
+        setloginServerError(Message);
+        console.log("message: ", message);
+        console.log("message: ", Message);
+      } finally {
+        setisLoginSubmitting(false);
+        //    showToast(
+        //    "error",
+        //  "Erreur de validation du nom"
+        //   );
       }
     });
 
@@ -125,6 +149,8 @@ export default function AuthPage() {
   const SignupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSignupErrors({});
+    setsignUpServerError(null);
+    setisSignUpSubmitting(true);
     const result = signupSchema.safeParse({
       fullName,
       email,
@@ -138,25 +164,37 @@ export default function AuthPage() {
         formatted[i.path[0] as string] = i.message;
       });
       setSignupErrors(formatted);
+      setisSignUpSubmitting(false);
       return;
     }
-        startTransition(async () => {
+    startTransition(async () => {
       try {
         const response = await axios.post(
           "http://localhost:9090/api/auth/register",
           { username: fullName, email, password },
           {
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
-    
-        router.push("/auth"); // // Rediriger vers login page (a discuter)
+        showToast("success", "Compte créé avec succès");
+
+        setFullName("");
+        setConfirmPassword("");
+        setShowPassword(false);
+        setShowConfirmPassword(false);
+        setTimeout(() => {
+          setActiveTab("connexion");
+        }, 500);
+        // router.push("/auth"); // // Rediriger vers login page (a discuter)
       } catch (err: any) {
         const message =
           err.response?.data?.message ||
           err.message ||
           "Une erreur est survenue. Veuillez réessayer.";
-        setServerError(message);
+        const Message = translateErrorMessage(message);
+        setsignUpServerError(Message);
+      } finally {
+        setisSignUpSubmitting(false);
       }
     });
     console.log("Signup:", { fullName, email, password, confirmPassword });
@@ -169,11 +207,16 @@ export default function AuthPage() {
     setActiveTab(tab);
     setLoginErrors({});
     setSignupErrors({});
+    setloginServerError(null);
+    setsignUpServerError(null);
   };
 
   return (
     <AuthContainer>
       <AuthCard activeTab={activeTab} onTabChange={onTabChange}>
+        {toast && (
+          <Toast type={toast.type} message={toast.message} onClose={() => {}} />
+        )}
         {activeTab === "connexion" ? (
           <LoginForm
             email={email}
@@ -181,6 +224,8 @@ export default function AuthPage() {
             rememberMe={rememberMe}
             showPassword={showPassword}
             errors={loginErrors}
+            serverError={loginServerError}
+            submitButtonState={isLoginSubmitting}
             onEmailChange={(e) => setEmail(e.target.value)}
             onPasswordChange={(e) => setPassword(e.target.value)}
             onRememberMeChange={(e) => setRememberMe(e.target.checked)}
@@ -194,6 +239,7 @@ export default function AuthPage() {
             onPasswordBlur={() =>
               validateField(loginSchema, "password", password, setLoginErrors)
             }
+            onDismiss={() => setloginServerError(null)}
           />
         ) : (
           <SignupForm
@@ -204,6 +250,8 @@ export default function AuthPage() {
             showPassword={showPassword}
             showConfirmPassword={showConfirmPassword}
             errors={signupErrors}
+            serverError={signUpServerError}
+            submitButtonState={isSignUpSubmitting}
             onFullNameChange={(e) => setFullName(e.target.value)}
             onEmailChange={(e) => setEmail(e.target.value)}
             onPasswordChange={(e) => setPassword(e.target.value)}
@@ -243,10 +291,10 @@ export default function AuthPage() {
               });
             }}
             onSubmit={SignupSubmit}
+            onDismiss={() => setsignUpServerError(null)}
           />
         )}
       </AuthCard>
     </AuthContainer>
-    
   );
 }

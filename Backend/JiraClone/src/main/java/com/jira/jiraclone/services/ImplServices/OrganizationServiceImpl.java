@@ -56,7 +56,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
     public void createOrganization(OrganizationDto organizationDto, UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         User creator = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+                .orElseThrow(() -> new NotFoundException("Utilisateur introuvable"));
 
         Organization organization = new Organization();
         organization.setName(organizationDto.getName());

@@ -204,7 +204,6 @@ public class SprintServiceImpl implements ISprintService {
         UserPrincipal principal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = principal.getUser();
         if ( user != null) {
-            System.out.println("User is " + user.getUsername() + " with ID: " + user.getId());
             return user;
 
         }

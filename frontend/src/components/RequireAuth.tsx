@@ -38,11 +38,7 @@ export default function RequireAuth({ children }: Props) {
         localStorage.removeItem("token");
         router.push("/auth");
       } else {
-         // setUser((prev) => ({
-          //   ...prev,
-          //   username: decoded.username,
-          //   email: decoded.email,
-          // }));
+
         setLoading(false);
       }
     } catch (decodeError) {

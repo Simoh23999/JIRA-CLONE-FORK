@@ -4,7 +4,7 @@ import { Organization, Member } from "@/components/organisation/types";
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
-// 🔹 Get ONE organization by ID
+// Get ONE organization by ID
 export const useGetOrganization = (id: number | string) => {
   return useQuery<Organization>({
     queryKey: ["workspaces", id],
@@ -21,7 +21,7 @@ export const useGetOrganization = (id: number | string) => {
   });
 };
 
-// 🔹 Get MEMBERS of organization
+// Get MEMBERS of organization
 export const useGetOrganizationMembers = (id: number | string) => {
   return useQuery<Member[]>({
     queryKey: ["organization-members", id],

@@ -4,7 +4,8 @@ export interface Organizer {
   avatarUrl?: string;
 }
 export interface Member {
-  userId: number;
+  memberishipId:number|string;
+  userId: number|string;
   fullName: string;
   username: string;
   email: string;

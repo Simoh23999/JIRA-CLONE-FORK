@@ -29,7 +29,10 @@ const buttonVariants = cva(
       "bg-[#f7fbfc] text-[#2a2e35] hover:bg-[#d6e6f2]",
 
     tertiary:
-      "bg-[#b9d7ea] text-[#2a2e35] hover:bg-[#24527a] hover:text-white"
+      "bg-[#b9d7ea] text-[#2a2e35] hover:bg-[#24527a] hover:text-white",
+
+    backbutton:
+      "inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors" 
        
         // Uncomment and customize these variants if needed
         // These are examples and can be modified or removed as per your design requirements

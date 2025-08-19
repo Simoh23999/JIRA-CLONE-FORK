@@ -18,7 +18,7 @@ export default function ProjectsList() {
   return (
     <div>
     <Label className="text-2xl font-bold text-[#24527a] flex items-center gap-2 mb-6">
-        Workspace List
+        Liste des organisations
 
       </Label>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

@@ -18,6 +18,7 @@ import { useCreateWorkspace } from "../api/use-create-workspace";
 import { useGetWorkspaces } from "../api/use-get-workspaces"; // ✅ Hook pour récupérer les organisations
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Props {
   onCancel?: () => void;
@@ -96,8 +97,8 @@ const CreateWorkspaceForm =  ({ onCancel }: Props) => {
               <FormItem>
                 <FormLabel>Description de l'organisation</FormLabel>
                 <FormControl>
-                  <textarea
-                    className="w-full pr-5 border-2"
+                  <Textarea
+                   
                     placeholder="Entrez la description de l'organisation"
                     {...field}
                   />

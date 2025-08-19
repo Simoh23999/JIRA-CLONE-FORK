@@ -1,10 +1,12 @@
 "use client";
 
 import React from "react";
-import { Building2 } from "lucide-react";
+import { Building2, User } from "lucide-react";
 import { Organization } from "../types";
+import { useGetOrganizationMembers } from "@/features/workspaces/api/use-get-workspace";
 
 export default function CardHeader({ org }: { org: Organization }) {
+   const { data: members} = useGetOrganizationMembers(org.id);
   return (
     <div className="flex items-center space-x-3 mb-2">
       {org.avatarUrl ? (
@@ -26,6 +28,11 @@ export default function CardHeader({ org }: { org: Organization }) {
         <p className="text-xs text-gray-500">
           {org.description || "No description"}
         </p>
+      </div>
+       {/* nombre de membres */}
+       <div className="flex items-center space-x-1 ml-auto">
+        <User className="inline-block w-3 h-3  text-gray-400" />
+        <span className="text-sm font-medium text-gray-400">{members?.length}</span>
       </div>
     </div>
   );

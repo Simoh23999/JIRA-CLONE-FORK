@@ -25,6 +25,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { queryClient } from "@/app/ReactQueryProvider";
 
 export function NavUser({
   user,
@@ -39,6 +40,8 @@ export function NavUser({
 
   function Logout() {
     localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    queryClient.clear();
   }
 
   // Si pas de user, on peut afficher un placeholder ou rien

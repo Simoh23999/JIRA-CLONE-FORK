@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
@@ -65,18 +65,29 @@ export default function DashboardLayout({
                 orientation="vertical"
                 className="mr-2 data-[orientation=vertical]:h-4"
               />
-              <Breadcrumb>
+               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">
                     <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                   </BreadcrumbItem>
+                  <BreadcrumbSeparator className="hidden md:block" />
+
+                  {segments.length > 2 &&
+                    segments.slice(1, -1).map((segment, index) => (
+                      <Fragment key={index}>
+                        <BreadcrumbItem>
+                          <BreadcrumbLink href={`/${segments.slice(0, index + 2).join("/")}`}>
+                            {formatPath(segment)}
+                          </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator className="hidden md:block" />
+                      </Fragment>
+                    ))}
+
                   {segments.length > 1 && (
-                    <>
-                      <BreadcrumbSeparator className="hidden md:block" />
-                      <BreadcrumbItem>
-                        <BreadcrumbPage>{currentPage}</BreadcrumbPage>
-                      </BreadcrumbItem>
-                    </>
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>{currentPage}</BreadcrumbPage>
+                    </BreadcrumbItem>
                   )}
                 </BreadcrumbList>
               </Breadcrumb>

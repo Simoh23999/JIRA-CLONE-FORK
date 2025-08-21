@@ -4,6 +4,11 @@ import InputField from "./ui/InputField";
 import PasswordField from "./ui/PasswordField";
 import AuthButton from "./ui/AuthButton";
 import styles from "./styles/LoginForm.module.css";
+import {
+  ServerErrorDisplay,
+  translateErrorMessage,
+  SimpleErrorText,
+} from "@/components/ErrorDisplay";
 
 type SignupFormProps = {
   fullName: string;
@@ -18,6 +23,9 @@ type SignupFormProps = {
     password?: string;
     confirmPassword?: string;
   };
+  serverError: string | null;
+  submitButtonState: boolean;
+  onDismiss: () => void;
   onFullNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -39,6 +47,8 @@ export default function SignupForm({
   showPassword,
   showConfirmPassword,
   errors,
+  serverError,
+  submitButtonState,
   onFullNameChange,
   onEmailChange,
   onPasswordChange,
@@ -50,9 +60,11 @@ export default function SignupForm({
   onEmailBlur,
   onPasswordBlur,
   onConfirmPasswordBlur,
+  onDismiss,
 }: SignupFormProps) {
   return (
     <form className="space-y-6" onSubmit={onSubmit}>
+      <ServerErrorDisplay error={serverError} onDismiss={onDismiss} />
       {/* full name input */}
       <InputField
         type="text"
@@ -105,7 +117,13 @@ export default function SignupForm({
       </div>
 
       {/* signup button */}
-      <AuthButton value="Registrer" style={styles.bg_loginButton_blue} />
+      <AuthButton
+        value="Inscription"
+        isLoading={submitButtonState}
+        disabled={submitButtonState}
+        loadingValue="Inscription..."
+        style={styles.bg_loginButton_blue}
+      />
     </form>
   );
 }

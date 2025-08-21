@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
@@ -22,7 +22,6 @@ import CreateWorkspaceModal from "@/features/workspaces/components/create-worksp
 import { useGetWorkspaces } from "@/features/workspaces/api/use-get-workspaces";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-
 function formatPath(path: string) {
   return path
     .split("-")
@@ -38,7 +37,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
   const { data: workspaces, isLoading, isError, error } = useGetWorkspaces();
-  
+
   const currentPage =
     segments.length > 1
       ? formatPath(segments[segments.length - 1])
@@ -54,7 +53,11 @@ export default function DashboardLayout({
 
   return (
     <RequireAuth>
-      <CreateWorkspaceModal open={open} onOpenChange={setOpen} canClose={canClose} />
+      <CreateWorkspaceModal
+        open={open}
+        onOpenChange={setOpen}
+        canClose={canClose}
+      />
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
@@ -70,13 +73,26 @@ export default function DashboardLayout({
                   <BreadcrumbItem className="hidden md:block">
                     <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                   </BreadcrumbItem>
+                  <BreadcrumbSeparator className="hidden md:block" />
+
+                  {segments.length > 2 &&
+                    segments.slice(1, -1).map((segment, index) => (
+                      <Fragment key={index}>
+                        <BreadcrumbItem>
+                          <BreadcrumbLink
+                            href={`/${segments.slice(0, index + 2).join("/")}`}
+                          >
+                            {formatPath(segment)}
+                          </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator className="hidden md:block" />
+                      </Fragment>
+                    ))}
+
                   {segments.length > 1 && (
-                    <>
-                      <BreadcrumbSeparator className="hidden md:block" />
-                      <BreadcrumbItem>
-                        <BreadcrumbPage>{currentPage}</BreadcrumbPage>
-                      </BreadcrumbItem>
-                    </>
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>{currentPage}</BreadcrumbPage>
+                    </BreadcrumbItem>
                   )}
                 </BreadcrumbList>
               </Breadcrumb>

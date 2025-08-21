@@ -39,14 +39,15 @@ export function TeamSwitcher({
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild className="p-3" >
+          <DropdownMenuTrigger asChild className="p-3">
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground "
             >
-              <div className="bg-amber-400 text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center  rounded-lg">
-                <activeTeam.logo className="size-4" />
+              <div className="bg-[#fff] text-white flex aspect-square w-8 h-8 items-center justify-center rounded-lg">
+                <activeTeam.logo className="w-4 h-4  fill-white" />
               </div>
+
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{activeTeam.name}</span>
                 <span className="truncate text-xs">{activeTeam.plan}</span>

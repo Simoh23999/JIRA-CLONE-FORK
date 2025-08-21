@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Building,
   CheckCircle,
@@ -8,6 +8,7 @@ import {
   Group,
   Home,
   Settings2,
+  ShoppingCartIcon,
   Users,
 } from "lucide-react";
 
@@ -27,8 +28,9 @@ import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-// import { useRouter } from "next/navigation";
-// import { usePathname } from "next/navigation";
+import { useGetProjects } from "@/features/project/api/use-get-project";
+import { Project } from "@/types/project";
+
 // import { useUser } from "@/app/context/UserContext";
 
 type JwtPayload = {
@@ -47,8 +49,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     email: "non défini",
     avatar: "/avatars/avatar.jpg",
   });
+  const workspaceId = 87; //// simulation
+
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const { data: projects } = useGetProjects(workspaceId);
+  // const projects: Project[] = [];
 
   useEffect(() => {
     try {
@@ -61,7 +68,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       const decoded = jwtDecode<JwtPayload>(token);
       if (decoded.exp && decoded.exp * 1000 < Date.now()) {
         localStorage.removeItem("token");
-        sessionStorage.removeItem("token")
+        sessionStorage.removeItem("token");
         router.push("/auth");
       } else {
         setUser((prev) => ({
@@ -75,6 +82,26 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     }
   }, [router]);
 
+  // Jouer la vidéo seulement si visible et montée
+  useEffect(() => {
+    if (isHovered && videoRef.current) {
+      const video = videoRef.current;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("Erreur lecture vidéo :", err);
+        });
+      }
+    }
+  }, [isHovered]);
+
+  // Transformation des projets API → format NavProjects
+  const sidebarProjects = (projects ?? []).map((p) => ({
+    ...p,
+    icon: Frame,
+    url: `/dashboard/projects/${p.id}`,
+  }));
+
   const data = {
     user,
     teams: [
@@ -82,7 +109,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       { name: "team1234", logo: Group, plan: "mohamed" },
     ],
     navMain: [
-      { title: "Home", url: "/", icon: Home, isActive: false, items: [] },
+      { title: "Accueil", url: "/", icon: Home, isActive: false, items: [] },
       {
         title: "Organisations",
         url: "/organisations",
@@ -91,22 +118,28 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         items: [],
       },
       {
-        title: "My Tasks",
+        title: "Mes Tâches",
         url: "/tasks",
         icon: CheckCircle,
         isActive: false,
         items: [],
       },
       {
-        title: "Members",
+        title: "Membres",
         url: "/members",
         icon: Users,
         isActive: false,
         items: [],
       },
-      { title: "Settings", url: "/settings", icon: Settings2, isActive: false },
+      {
+        title: "Paramètres",
+        url: "/settings",
+        icon: Settings2,
+        isActive: false,
+      },
     ],
-    projects: [{ name: "jira clone", url: "#", icon: Frame }],
+
+    projects: sidebarProjects,
   };
 
   return (
@@ -119,10 +152,10 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         >
           {isHovered ? (
             <video
+              ref={videoRef}
               src="/TaskFlow.mp4"
-              className="w-20  à h-10 object-cover rounded-full transition-all duration-300"
+              className="w-20 h-10 object-cover rounded-full transition-all duration-300"
               muted
-              autoPlay
               loop
               playsInline
             />

@@ -9,7 +9,7 @@ import { useGetWorkspaces } from "../api/use-get-workspaces";
 export default function SearchUi() {
   const [query, setQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState<any[]>([]);
-  const { workspaces, loading, error } = useGetWorkspaces();
+  const { data: workspaces, isLoading, isError, error } = useGetWorkspaces();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -20,10 +20,11 @@ export default function SearchUi() {
       return;
     }
 
-    // Filtrer la liste selon la query 
-    const filtered = workspaces?.filter((item) =>
-      item.name.toLowerCase().includes(value.toLowerCase())
-    ) || [];
+    // Filtrer la liste selon la query
+    const filtered =
+      workspaces?.filter((item) =>
+        item.name.toLowerCase().includes(value.toLowerCase()),
+      ) || [];
 
     setFilteredResults(filtered);
   };

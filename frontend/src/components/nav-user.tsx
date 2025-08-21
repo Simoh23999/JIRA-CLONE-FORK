@@ -25,6 +25,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { queryClient } from "@/app/ReactQueryProvider";
 
 export function NavUser({
   user,
@@ -40,6 +41,7 @@ export function NavUser({
   function Logout() {
     localStorage.removeItem("token");
     sessionStorage.removeItem("token");
+    queryClient.clear();
   }
 
   // Si pas de user, on peut afficher un placeholder ou rien
@@ -63,7 +65,10 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-10 w-10 rounded-lg">
-                <AvatarImage src={user.avatar ?? ""} alt={user.username ?? "U"} />
+                <AvatarImage
+                  src={user.avatar ?? ""}
+                  alt={user.username ?? "U"}
+                />
                 <AvatarFallback className="rounded-lg">
                   {user.username?.[0] ?? "U"}
                 </AvatarFallback>
@@ -86,7 +91,10 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-lg">
                 <Avatar className="h-10 w-10 rounded-lg">
-                  <AvatarImage src={user.avatar ?? ""} alt={user.username ?? "U"} />
+                  <AvatarImage
+                    src={user.avatar ?? ""}
+                    alt={user.username ?? "U"}
+                  />
                   <AvatarFallback className="rounded-lg">
                     {user.username?.[0] ?? "U"}
                   </AvatarFallback>

@@ -16,52 +16,42 @@ export default function RequireAuth({ children }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-
-   try {
-
-  if (token) {
-    // Vérifier le format du token (3 parties séparées par des points)
-    const parts = token.split(".");
-    if (parts.length !== 3) {
-      console.warn("Format de token invalide");
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("token");
-      router.push("/auth");
-      return;
-    }
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
 
     try {
-      const decoded = jwtDecode<JwtPayload>(token);
+      if (token) {
+        // Vérifier le format du token (3 parties séparées par des points)
+        const parts = token.split(".");
+        if (parts.length !== 3) {
+          console.warn("Format de token invalide");
+          localStorage.removeItem("token");
+          sessionStorage.removeItem("token");
+          router.push("/auth");
+          return;
+        }
 
-      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-        console.warn("Token expiré");
-        localStorage.removeItem("token");
-        sessionStorage.removeItem("token")
-        router.push("/auth");
-      } else {
-         // setUser((prev) => ({
-          //   ...prev,
-          //   username: decoded.username,
-          //   email: decoded.email,
-          // }));
-        setLoading(false);
+        try {
+          const decoded = jwtDecode<JwtPayload>(token);
+
+          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+            console.warn("Token expiré");
+            localStorage.removeItem("token");
+            sessionStorage.removeItem("token");
+            router.push("/auth");
+          } else {
+            setLoading(false);
+          }
+        } catch (decodeError) {
+          console.error("Erreur lors du décodage du token :", decodeError);
+          localStorage.removeItem("token");
+          sessionStorage.removeItem("token");
+          router.push("/auth");
+        }
       }
-    } catch (decodeError) {
-      console.error("Erreur lors du décodage du token :", decodeError);
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("token")
-      router.push("/auth");
+    } catch (err) {
+      console.error("Erreur inattendue :", err);
     }
-  }
-} catch (err) {
-  console.error("Erreur inattendue :", err);
-}
-
-
-
-
-
 
     // if (!token) {
     //   router.push("/auth");
@@ -80,7 +70,5 @@ export default function RequireAuth({ children }: Props) {
     );
   }
 
-
-  
   return <>{children}</>;
 }

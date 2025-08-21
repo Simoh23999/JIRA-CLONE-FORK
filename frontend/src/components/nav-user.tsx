@@ -25,6 +25,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useAuth } from "@/app/context/UserContext";
 
 export function NavUser({
   user,
@@ -36,6 +37,7 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const { logout } = useAuth();
 
   function Logout() {
     localStorage.removeItem("token");
@@ -63,7 +65,10 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-10 w-10 rounded-lg">
-                <AvatarImage src={user.avatar ?? ""} alt={user.username ?? "U"} />
+                <AvatarImage
+                  src={user.avatar ?? ""}
+                  alt={user.username ?? "U"}
+                />
                 <AvatarFallback className="rounded-lg">
                   {user.username?.[0] ?? "U"}
                 </AvatarFallback>
@@ -86,7 +91,10 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-lg">
                 <Avatar className="h-10 w-10 rounded-lg">
-                  <AvatarImage src={user.avatar ?? ""} alt={user.username ?? "U"} />
+                  <AvatarImage
+                    src={user.avatar ?? ""}
+                    alt={user.username ?? "U"}
+                  />
                   <AvatarFallback className="rounded-lg">
                     {user.username?.[0] ?? "U"}
                   </AvatarFallback>
@@ -123,7 +131,8 @@ export function NavUser({
               </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={() => Logout()}>
+            {/* <DropdownMenuItem variant="destructive" onClick={() => Logout()}> */}
+            <DropdownMenuItem variant="destructive" onClick={logout}>
               <Link href="/auth" className="flex items-center">
                 <LogOut className="mr-2 h-4 w-4 text-red-500" />
                 Logout

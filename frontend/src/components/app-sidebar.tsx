@@ -27,6 +27,7 @@ import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/app/context/UserContext";
 // import { useRouter } from "next/navigation";
 // import { usePathname } from "next/navigation";
 // import { useUser } from "@/app/context/UserContext";
@@ -42,39 +43,40 @@ type JwtPayload = {
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
-  const [user, setUser] = useState({
-    name: "Utilisateur",
-    email: "non défini",
-    avatar: "/avatars/avatar.jpg",
-  });
+  // const [user, setUser] = useState({
+  //   name: "Utilisateur",
+  //   email: "non défini",
+  //   avatar: "/avatars/avatar.jpg",
+  // });
   const [isHovered, setIsHovered] = useState(false);
-  const router = useRouter();
+  // const router = useRouter();
 
-  useEffect(() => {
-    try {
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
-      if (!token) {
-        router.push("/auth");
-        return;
-      }
-      const decoded = jwtDecode<JwtPayload>(token);
-      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-        localStorage.removeItem("token");
-        sessionStorage.removeItem("token")
-        router.push("/auth");
-      } else {
-        setUser((prev) => ({
-          ...prev,
-          username: decoded.username,
-          email: decoded.email,
-        }));
-      }
-    } catch (err) {
-      console.error("Erreur lors du décodage du token :", err);
-    }
-  }, [router]);
-
+  const { user, isLoading } = useAuth();
+  // useEffect(() => {
+  //   try {
+  //     const token =
+  //       localStorage.getItem("token") || sessionStorage.getItem("token");
+  //     if (!token) {
+  //       router.push("/auth");
+  //       return;
+  //     }
+  //     const decoded = jwtDecode<JwtPayload>(token);
+  //     if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+  //       localStorage.removeItem("token");
+  //       sessionStorage.removeItem("token")
+  //       router.push("/auth");
+  //     } else {
+  //       setUser((prev) => ({
+  //         ...prev,
+  //         username: decoded.username,
+  //         email: decoded.email,
+  //       }));
+  //     }
+  //   } catch (err) {
+  //     console.error("Erreur lors du décodage du token :", err);
+  //   }
+  // }, [router]);
+  console.log("user: ", user);
   const data = {
     user,
     teams: [

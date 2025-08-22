@@ -11,7 +11,8 @@ export function useGetProjectById(projectid: number | string) {
     queryKey: ["projects", projectid],
     queryFn: async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token =
+          localStorage.getItem("token") || sessionStorage.getItem("token");
         const response = await axios.get(
           `${baseURL}/api/projects/${projectid}`,
           {
@@ -37,7 +38,8 @@ export function useGetProjects(workspaceId: number | string) {
     queryKey: ["projects", workspaceId],
     queryFn: async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token =
+          localStorage.getItem("token") || sessionStorage.getItem("token");
         const response = await axios.get(
           `${baseURL}/api/projects/organizations/${workspaceId}/projects`,
           {

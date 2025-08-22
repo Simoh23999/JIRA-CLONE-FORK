@@ -8,7 +8,8 @@ const HomePage: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
 
     if (!token) {
       // Pas de token → redirection vers page de connexion

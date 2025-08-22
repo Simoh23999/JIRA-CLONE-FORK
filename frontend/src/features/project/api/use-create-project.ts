@@ -11,7 +11,8 @@ export const useCreateProject = (organisationid: string | number) => {
 
   return useMutation({
     mutationFn: async (values: z.infer<typeof projectSchema>) => {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       const response = await axios.post(
         `${baseURL}/api/projects/organizations/${organisationid}/projects`,
         values,

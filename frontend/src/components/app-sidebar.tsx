@@ -22,6 +22,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 import Image from "next/image";
@@ -57,6 +58,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const { data:projects } = useGetProjects(workspaceId);
   // const projects: Project[] = [];
+  const { state } = useSidebar(); 
 
   useEffect(() => {
     try {
@@ -148,14 +150,23 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <div
-          className="flex items-center justify-center py-1 pr-0 transition-opacity duration-300"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {isHovered ? (
-             <video
+     <SidebarHeader>
+        {state === "collapsed" ? (
+          <Image
+            src="/TaskFlowicon.png"
+            alt="logo"
+            width={35}
+            height={35}
+            className="transition-all duration-300"
+          />
+        ) : (
+          <div
+            className="flex items-center justify-center py-1 pr-0 transition-opacity duration-300"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            {isHovered ? (
+              <video
                 ref={videoRef}
                 src="/TaskFlow.mp4"
                 className="w-20 h-10 object-cover rounded-full transition-all duration-300"
@@ -163,17 +174,20 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 loop
                 playsInline
               />
-          ) : (
-            <Image
-              src="/TaskFlow.png"
-              alt="logo"
-              width={85}
-              height={85}
-              className="transition-all duration-300"
-            />
-          )}
-        </div>
-        <TeamSwitcher teams={data.teams} />
+            ) : (
+              <Image
+                src="/TaskFlow.png"
+                alt="logo"
+                width={85}
+                height={85}
+                className="transition-all duration-300"
+              />
+            )}
+          </div>
+        )}
+
+        {/* TeamSwitcher uniquement si expanded */}
+         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
 
       <SidebarContent>

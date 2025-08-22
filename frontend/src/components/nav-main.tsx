@@ -48,6 +48,7 @@ const sidebarStyles = `
     color: #4a4a4a !important;
     background-color: transparent !important;
   }
+    
 
   [data-sidebar="menu-button"] svg {
     color: #7a7a7a !important;
@@ -186,6 +187,47 @@ const sidebarStyles = `
     opacity: 0.8;
   }
 
+  /* ===== FIX POUR MODE ICÔNE (SIDEBAR COLLAPSE) ===== */
+  /* Quand la sidebar est collapsée - utilise l'attribut data-state */
+  [data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-button"] {
+    justify-content: center !important;
+    padding: 10px !important;
+  }
+
+  [data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-button"] svg {
+    margin: 0 !important;
+  }
+
+  /* Cacher les chevrons en mode collapsed */
+  [data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-button"] svg[class*="ChevronRight"],
+  [data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-button"] .lucide-chevron-right {
+    display: none !important;
+  }
+
+  /* Cacher le label du groupe en mode collapsed */
+  [data-sidebar="sidebar"][data-state="collapsed"] [data-slot="sidebar-group-label"] {
+    display: none !important;
+  }
+
+  /* Alternative avec data-collapsible="icon" si c'est ce qui est utilisé */
+  [data-sidebar="sidebar"][data-collapsible="icon"] [data-sidebar="menu-button"],
+  [data-collapsible="icon"] [data-sidebar="menu-button"] {
+    justify-content: center !important;
+    padding: 10px !important;
+  }
+
+  [data-sidebar="sidebar"][data-collapsible="icon"] [data-sidebar="menu-button"] svg,
+  [data-collapsible="icon"] [data-sidebar="menu-button"] svg {
+    margin: 0 !important;
+  }
+
+  [data-sidebar="sidebar"][data-collapsible="icon"] [data-sidebar="menu-button"] svg[class*="ChevronRight"],
+  [data-sidebar="sidebar"][data-collapsible="icon"] [data-sidebar="menu-button"] .lucide-chevron-right,
+  [data-collapsible="icon"] [data-sidebar="menu-button"] svg[class*="ChevronRight"],
+  [data-collapsible="icon"] [data-sidebar="menu-button"] .lucide-chevron-right {
+    display: none !important;
+  }
+
   @media (max-width: 768px) {
     [data-sidebar="menu-button"] {
       padding: 8px 10px !important;
@@ -195,9 +237,14 @@ const sidebarStyles = `
       padding: 6px 10px !important;
       font-size: 0.8rem !important;
     }
+
+    /* Mode icône responsive - plusieurs variantes pour couvrir tous les cas */
+    [data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-button"],
+    [data-sidebar="sidebar"][data-collapsible="icon"] [data-sidebar="menu-button"],
+    [data-collapsible="icon"] [data-sidebar="menu-button"] {
+      padding: 8px !important;
+    }
   }
-
-
 `;
 
 type NavItem = {
@@ -256,8 +303,8 @@ export function NavMain({
               defaultOpen={item.isActive}
               className="group/collapsible"
             >
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
+              <SidebarMenuItem >
+                <CollapsibleTrigger  asChild>
                   {hasChildren ? (
                     <SidebarMenuButton tooltip={item.title}>
                       {Icon && <Icon />}
@@ -265,13 +312,14 @@ export function NavMain({
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </SidebarMenuButton>
                   ) : (
-                    <Link href={`/dashboard${item.url}`}>
+                    <Link href={`/dashboard${item.url}`}  >
                       <SidebarMenuButton
                         tooltip={item.title}
                         data-active={isItemActive(item) || undefined}
+                        
                       >
-                        {Icon && <Icon />}
-                        <span>{item.title}</span>
+                        {Icon && <Icon  />}
+                        <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                       </SidebarMenuButton>
                     </Link>
                   )}

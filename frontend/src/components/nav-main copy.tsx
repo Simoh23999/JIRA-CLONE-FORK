@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/sidebar";
 
 // temporairement, a modifier apres
+// Dans votre fichier nav-main.tsx
+
 const sidebarStyles = `
   [data-sidebar="sidebar"] {
     background-color: #f7fbfc !important;
@@ -109,7 +111,6 @@ const sidebarStyles = `
     gap: 1px !important;
   }
 
-
   /* ===== ANIMATIONS COLLAPSIBLE ===== */
   [data-radix-collapsible-content] {
     overflow: hidden !important;
@@ -186,6 +187,60 @@ const sidebarStyles = `
     opacity: 0.8;
   }
 
+  /* ===== SOLUTION ALTERNATIVE POUR TOUS LES COMPOSANTS EN MODE ICÔNE ===== */
+  /* Plus agressive - devrait fonctionner pour NavMain, NavUser, TeamSwitcher */
+  [data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-button"],
+  [data-sidebar="sidebar"][data-collapsible="icon"] [data-sidebar="menu-button"] {
+    justify-content: center !important;
+    padding: 10px !important;
+    text-align: center !important;
+  }
+
+  /* Cacher tout le texte en mode collapsed */
+  [data-sidebar="sidebar"][data-state="collapsed"] .grid,
+  [data-sidebar="sidebar"][data-state="collapsed"] .truncate,
+  [data-sidebar="sidebar"][data-state="collapsed"] .text-xs,
+  [data-sidebar="sidebar"][data-state="collapsed"] .text-sm,
+  [data-sidebar="sidebar"][data-state="collapsed"] .leading-tight,
+  [data-sidebar="sidebar"][data-state="collapsed"] span:not([class*="avatar"]):not(.sr-only),
+  [data-sidebar="sidebar"][data-collapsible="icon"] .grid,
+  [data-sidebar="sidebar"][data-collapsible="icon"] .truncate,
+  [data-sidebar="sidebar"][data-collapsible="icon"] .text-xs,
+  [data-sidebar="sidebar"][data-collapsible="icon"] .text-sm,
+  [data-sidebar="sidebar"][data-collapsible="icon"] .leading-tight,
+  [data-sidebar="sidebar"][data-collapsible="icon"] span:not([class*="avatar"]):not(.sr-only) {
+    display: none !important;
+  }
+
+  /* Cacher tous les chevrons en mode collapsed */
+  [data-sidebar="sidebar"][data-state="collapsed"] .lucide-chevrons-up-down,
+  [data-sidebar="sidebar"][data-state="collapsed"] .lucide-chevron-right,
+  [data-sidebar="sidebar"][data-state="collapsed"] svg[data-lucide="chevrons-up-down"],
+  [data-sidebar="sidebar"][data-state="collapsed"] svg[data-lucide="chevron-right"],
+  [data-sidebar="sidebar"][data-collapsible="icon"] .lucide-chevrons-up-down,
+  [data-sidebar="sidebar"][data-collapsible="icon"] .lucide-chevron-right,
+  [data-sidebar="sidebar"][data-collapsible="icon"] svg[data-lucide="chevrons-up-down"],
+  [data-sidebar="sidebar"][data-collapsible="icon"] svg[data-lucide="chevron-right"] {
+    display: none !important;
+  }
+
+  /* Centrer les avatars et icônes */
+  [data-sidebar="sidebar"][data-state="collapsed"] .avatar,
+  [data-sidebar="sidebar"][data-state="collapsed"] [class*="avatar"],
+  [data-sidebar="sidebar"][data-state="collapsed"] svg:not(.lucide-chevrons-up-down):not(.lucide-chevron-right),
+  [data-sidebar="sidebar"][data-collapsible="icon"] .avatar,
+  [data-sidebar="sidebar"][data-collapsible="icon"] [class*="avatar"],
+  [data-sidebar="sidebar"][data-collapsible="icon"] svg:not(.lucide-chevrons-up-down):not(.lucide-chevron-right) {
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Cacher les labels de groupe en mode collapsed */
+  [data-sidebar="sidebar"][data-state="collapsed"] [data-slot="sidebar-group-label"],
+  [data-sidebar="sidebar"][data-collapsible="icon"] [data-slot="sidebar-group-label"] {
+    display: none !important;
+  }
+
   @media (max-width: 768px) {
     [data-sidebar="menu-button"] {
       padding: 8px 10px !important;
@@ -195,9 +250,13 @@ const sidebarStyles = `
       padding: 6px 10px !important;
       font-size: 0.8rem !important;
     }
+
+    /* Mode icône responsive */
+    [data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-button"],
+    [data-sidebar="sidebar"][data-collapsible="icon"] [data-sidebar="menu-button"] {
+      padding: 8px !important;
+    }
   }
-
-
 `;
 
 type NavItem = {

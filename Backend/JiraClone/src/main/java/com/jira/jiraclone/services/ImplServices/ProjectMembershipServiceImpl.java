@@ -184,6 +184,7 @@ public class ProjectMembershipServiceImpl implements IProjectMembershipService {
                         .id(pm.getId())
                         .membershipId(pm.getMembership().getUser().getId())
                         .fullName(pm.getMembership().getUser().getUsername())
+                        .email(pm.getMembership().getUser().getEmail())
                         .roleInProject(pm.getRoleInProject())
                         .build())
                 .toList();

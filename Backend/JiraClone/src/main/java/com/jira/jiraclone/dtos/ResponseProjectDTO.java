@@ -16,6 +16,7 @@ public class ResponseProjectDTO {
     private Long id;
     private String name;
     private String description;
+    private long organizationId;
     private String organizationName;
     private String createdByName;
     private LocalDateTime createdAt;

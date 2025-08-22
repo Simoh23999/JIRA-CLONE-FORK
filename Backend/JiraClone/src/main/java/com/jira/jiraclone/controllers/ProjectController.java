@@ -45,7 +45,7 @@ public class ProjectController {
         Map<String, Object> response = new HashMap<>();
         response.put("status", 201);
         response.put("message", "Projet créé avec succès");
-        response.put("project", mapToResponseDTO(project));
+//        response.put("project", mapToResponseDTO(project));
 
         return ResponseEntity.status(201).body(response);
     }
@@ -128,6 +128,7 @@ public class ProjectController {
                 .id(project.getId())
                 .name(project.getName())
                 .description(project.getDescription())
+                .organizationId( project.getOrganization().getId())
                 .organizationName(project.getOrganization() != null ? project.getOrganization().getName() : null)
                 .createdByName(project.getCreatedBy() != null ? project.getCreatedBy().getUser().getUsername() : null)
                 .createdAt(project.getCreatedAt())

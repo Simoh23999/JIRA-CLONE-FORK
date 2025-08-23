@@ -21,10 +21,10 @@ public class SprintController {
 //    creeation de sprint (seul PROJECT_OWNER peut créer un sprint)
     @PostMapping
     @PreAuthorize("@sprintSecurityService.canCreateSprint(#dto.projectId)")
-    public ResponseEntity<String> createSprint(@Valid @RequestBody SprintRequestDTO dto) {
-        sprintService.createSprint(dto);
+    public ResponseEntity<Sprint> createSprint(@Valid @RequestBody SprintRequestDTO dto) {
+        Sprint createdSprint = sprintService.createSprint(dto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Sprint créé avec succès");
+                .body(createdSprint);
     }
 
 // modifier un spriny (seul PROJECT_OWNER peut le mpdfier)

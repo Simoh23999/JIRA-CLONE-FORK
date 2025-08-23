@@ -1,5 +1,6 @@
 package com.jira.jiraclone.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jira.jiraclone.entities.enums.SprintStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,10 +28,12 @@ public class Sprint {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_project_membership_id", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private ProjectMembership createdByProjectMembership;
 
     private LocalDate startDate;

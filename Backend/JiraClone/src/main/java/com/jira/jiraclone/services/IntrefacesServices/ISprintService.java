@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ISprintService {
-    void createSprint(SprintRequestDTO dto);
+    Sprint createSprint(SprintRequestDTO dto);
     void updateSprint(Long id, SprintRequestDTO dto);
 
     void startSprint(Long sprintId);

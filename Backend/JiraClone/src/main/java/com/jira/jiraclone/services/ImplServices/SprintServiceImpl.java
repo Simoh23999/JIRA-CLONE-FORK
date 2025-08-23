@@ -33,7 +33,7 @@ public class SprintServiceImpl implements ISprintService {
     private final ProjectMembershipRepository projectMembershipRepository;
 
     @Override
-    public void createSprint(SprintRequestDTO dto) {
+    public Sprint createSprint(SprintRequestDTO dto) {
         // Validation des dates
         validateSprintDates(dto.getStartDate(), dto.getEndDate());
 
@@ -50,10 +50,10 @@ public class SprintServiceImpl implements ISprintService {
 
 
         // Vérifier qu'il n'y a pas déjà un sprint actif dans ce projet
-        List<Sprint> activeSprints = sprintRepository.findByProjectIdAndStatus(dto.getProjectId(), SprintStatus.ACTIVE);
-        if (!activeSprints.isEmpty()) {
-            throw new ConflictException("Il existe déjà un sprint actif dans ce projet");
-        }
+//        List<Sprint> activeSprints = sprintRepository.findByProjectIdAndStatus(dto.getProjectId(), SprintStatus.ACTIVE);
+//        if (!activeSprints.isEmpty()) {
+//            throw new ConflictException("Il existe déjà un sprint actif dans ce projet");
+//        }
 
         // Créer le sprint
         Sprint sprint = Sprint.builder()
@@ -66,7 +66,7 @@ public class SprintServiceImpl implements ISprintService {
                 .status(dto.getStatus() != null ? dto.getStatus() : SprintStatus.PLANNED)
                 .build();
 
-        sprintRepository.save(sprint);
+        return sprintRepository.save(sprint);
     }
 
     @Override

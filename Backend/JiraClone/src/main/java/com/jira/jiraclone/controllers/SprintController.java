@@ -14,6 +14,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/sprints")
+@CrossOrigin(origins = {
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://0.0.0.0:3000"
+})
 @RequiredArgsConstructor
 public class SprintController {
 

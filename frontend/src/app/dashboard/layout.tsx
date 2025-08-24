@@ -21,6 +21,7 @@ import RequireAuth from "@/components/RequireAuth";
 import CreateWorkspaceModal from "@/features/workspaces/components/create-workspace-modal";
 import { useGetWorkspaces } from "@/features/workspaces/api/use-get-workspaces";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "@/app/context/UserContext";
 
 function formatPath(path: string) {
   return path
@@ -52,55 +53,46 @@ export default function DashboardLayout({
   }, [isLoading, workspaces]);
 
   return (
-    <RequireAuth>
-      <CreateWorkspaceModal
-        open={open}
-        onOpenChange={setOpen}
-        canClose={canClose}
-      />
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-            <div className="flex items-center gap-2 px-4">
-              <SidebarTrigger className="-ml-1" />
-              <Separator
-                orientation="vertical"
-                className="mr-2 data-[orientation=vertical]:h-4"
-              />
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
-
-                  {segments.length > 2 &&
-                    segments.slice(1, -1).map((segment, index) => (
-                      <Fragment key={index}>
-                        <BreadcrumbItem>
-                          <BreadcrumbLink
-                            href={`/${segments.slice(0, index + 2).join("/")}`}
-                          >
-                            {formatPath(segment)}
-                          </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator className="hidden md:block" />
-                      </Fragment>
-                    ))}
-
-                  {segments.length > 1 && (
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>{currentPage}</BreadcrumbPage>
+    <AuthProvider>
+      <RequireAuth>
+        <CreateWorkspaceModal
+          open={open}
+          onOpenChange={setOpen}
+          canClose={canClose}
+        />
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1" />
+                <Separator
+                  orientation="vertical"
+                  className="mr-2 data-[orientation=vertical]:h-4"
+                />
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem className="hidden md:block">
+                      <BreadcrumbLink href="/dashboard">
+                        Dashboard
+                      </BreadcrumbLink>
                     </BreadcrumbItem>
-                  )}
-                </BreadcrumbList>
-              </Breadcrumb>
-            </div>
-          </header>
-          <main className="flex-1 p-4 pt-0">{children}</main>
-        </SidebarInset>
-      </SidebarProvider>
-    </RequireAuth>
+                    {segments.length > 1 && (
+                      <>
+                        <BreadcrumbSeparator className="hidden md:block" />
+                        <BreadcrumbItem>
+                          <BreadcrumbPage>{currentPage}</BreadcrumbPage>
+                        </BreadcrumbItem>
+                      </>
+                    )}
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+            </header>
+            <main className="flex-1 p-4 pt-0">{children}</main>
+          </SidebarInset>
+        </SidebarProvider>
+      </RequireAuth>
+    </AuthProvider>
   );
 }

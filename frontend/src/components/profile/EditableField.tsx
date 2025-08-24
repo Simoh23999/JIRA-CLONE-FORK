@@ -37,6 +37,10 @@ export const EditableField: React.FC<EditableFieldProps> = ({
   const [currentValue, setCurrentValue] = useState(value);
   const [isHovered, setIsHovered] = useState(false);
 
+  const handleEdit = () => {
+    setCurrentValue(value); // S'assurer que la valeur est synchronisée
+    setIsEditing(true);
+  };
   const handleSave = async () => {
     await onSave(currentValue);
     setIsEditing(false);
@@ -73,10 +77,10 @@ export const EditableField: React.FC<EditableFieldProps> = ({
           )}
           {isHovered &&
             (renderEditButton ? (
-              renderEditButton(() => setIsEditing(true))
+              renderEditButton(handleEdit)
             ) : (
               <button
-                onClick={() => setIsEditing(true)}
+                onClick={handleEdit}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 flex-shrink-0 animate-fade-in hover:cursor-pointer"
                 aria-label="Edit field"
               >

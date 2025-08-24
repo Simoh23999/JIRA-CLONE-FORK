@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useAuth } from "@/app/context/UserContext";
 interface ProfileData {
   name: string;
   email: string;
@@ -13,6 +14,7 @@ interface ValidationErrors {
 }
 
 export const useProfileData = (initialData: ProfileData) => {
+  const { refreshUserData } = useAuth();
   type AutoSaveStatus = "idle" | "saving" | "saved";
   const [profileData, setProfileData] = useState(initialData);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
@@ -84,6 +86,7 @@ export const useProfileData = (initialData: ProfileData) => {
 
       setValidationErrors({});
       setProfileData((prev) => ({ ...prev, name }));
+      await refreshUserData();
       showSaveAnimation();
 
       return true;

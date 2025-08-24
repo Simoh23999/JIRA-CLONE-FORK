@@ -21,6 +21,7 @@ interface AuthContextType {
   user: User;
   updateUser: (userData: Partial<User>) => void;
   refreshUserData: () => Promise<boolean>;
+  refreshToken: () => Promise<string | null>;
   isInitialized: boolean;
   isLoading: boolean;
   logout: () => void;
@@ -138,10 +139,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setIsLoading(true);
       console.log(" =================== useEffect ===================== ");
+      console.log(
+        "token ",
+        localStorage.getItem("token") || sessionStorage.getItem("token"),
+      );
       try {
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
         if (!token) {
+          console.log("here im ");
           router.push("/auth");
           return;
         }
@@ -187,6 +193,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         updateUser,
         refreshUserData,
+        refreshToken,
         isLoading,
         isInitialized,
         logout,

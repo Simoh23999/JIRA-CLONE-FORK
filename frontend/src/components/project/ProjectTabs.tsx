@@ -24,6 +24,9 @@ export const ProjectTabs = () => {
         <TabsTrigger value="backlog" icon={<List />}>
           Backlog
         </TabsTrigger>
+        <TabsTrigger value="Sprints" icon={<List />}>
+          Sprints
+        </TabsTrigger>
         <TabsTrigger value="toutes" icon={<Grid />}>
           Tâches
         </TabsTrigger>

@@ -14,7 +14,8 @@ export const useDeleteMember = () => {
 
   return useMutation({
     mutationFn: async (values: DeleteMemberPayload): Promise<any> => {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
 
       const response = await axios.delete(
         `${baseURL}/api/projects/members/${values.projectMembershipId}`,

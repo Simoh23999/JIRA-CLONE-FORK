@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { queryClient } from "@/app/ReactQueryProvider";
+import { useAuth } from "@/app/context/UserContext";
 
 export function NavUser({
   user,
@@ -37,6 +38,7 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const { logout } = useAuth();
 
   function Logout() {
     localStorage.removeItem("token");
@@ -131,7 +133,8 @@ export function NavUser({
               </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={() => Logout()}>
+            {/* <DropdownMenuItem variant="destructive" onClick={() => Logout()}> */}
+            <DropdownMenuItem variant="destructive" onClick={logout}>
               <Link href="/auth" className="flex items-center">
                 <LogOut className="mr-2 h-4 w-4 text-red-500" />
                 Logout

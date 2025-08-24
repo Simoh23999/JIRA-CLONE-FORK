@@ -16,7 +16,8 @@ export const useUpdateMemberProjectRole = () => {
     mutationFn: async (
       values: z.infer<typeof UpdateMemberRolePayload>,
     ): Promise<any> => {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       const response = await axios.put(
         `${baseURL}/api/projects/members/${values.projectMembershipId}/role?newRole=${values.newRole}`,
         null, // body JSON

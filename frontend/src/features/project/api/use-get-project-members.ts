@@ -8,7 +8,8 @@ export const useGetProjectMembers = (id: number | string) => {
   return useQuery<ProjectMember[]>({
     queryKey: ["project-members"],
     queryFn: async () => {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       const response = await axios.get(
         `${baseURL}/api/projects/${id}/members`,
         {
@@ -16,6 +17,10 @@ export const useGetProjectMembers = (id: number | string) => {
             Authorization: `Bearer ${token}`,
           },
         },
+      );
+      console.log(
+        "membres :          <<<<<<<<<<<<<<<<<<",
+        response.data.members,
       );
       return response.data.members;
     },

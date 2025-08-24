@@ -25,7 +25,8 @@ export function useAuthRole(members?: Member[]) {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
     if (!token) {
       router.push("/auth");
       return;

@@ -62,6 +62,7 @@ import { useDeleteProject } from "@/features/project/api/use-delete-project";
 import { useRouter } from "next/navigation";
 import { useProjectAuthRole } from "@/hooks/useProjectAuthRole";
 import { useGetProjectMembers } from "@/features/project/api/use-get-project-members";
+import SprintPage from "@/components/sprint/sprintPage";
 
 interface Props {
   project: Project;
@@ -136,6 +137,7 @@ const ProjectDetails = ({ project, member }: Props) => {
       toast.error("Erreur lors de la suppression du projet");
     }
   };
+  console.log(">>>>>>>>>>>>> role dans project details : ", isProjectOwner);
 
   return (
     <div className="space-y-8">
@@ -152,6 +154,15 @@ const ProjectDetails = ({ project, member }: Props) => {
         <TabsContent value="backlog">
           <TaskColumn
             title="Sprint"
+            onTaskClick={handleTaskClick}
+            isFullWidth
+          />
+        </TabsContent>
+
+        <TabsContent value="Sprints">
+          <SprintPage
+            title="Sprint"
+            isProjectOwner={isProjectOwner}
             onTaskClick={handleTaskClick}
             isFullWidth
           />

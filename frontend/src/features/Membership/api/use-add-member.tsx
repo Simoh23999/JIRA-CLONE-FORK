@@ -14,7 +14,8 @@ export const useAddMemberToOrganization = () => {
     mutationFn: async (
       values: z.infer<typeof addMemberSchema>,
     ): Promise<any> => {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
 
       const response = await axios.post(
         `${baseURL}/api/memberships/add`,

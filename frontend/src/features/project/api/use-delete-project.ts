@@ -14,7 +14,8 @@ export function useDeleteProject() {
 
   return useMutation({
     mutationFn: async (values: DeleteProjectPayload): Promise<any> => {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       const res = await axios.delete(
         `${baseURL}/api/projects/${values.projectId}`,
         {

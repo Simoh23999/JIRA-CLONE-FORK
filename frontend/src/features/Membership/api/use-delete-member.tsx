@@ -18,7 +18,8 @@ export const useDeleteMemberFromOrganization = () => {
       organizationId,
       targetUserId,
     }: DeleteMemberPayload): Promise<any> => {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
 
       const response = await axios.delete(
         `${baseURL}/api/organizations/${organizationId}/members/${targetUserId}`,

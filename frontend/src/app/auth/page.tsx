@@ -57,7 +57,8 @@ export default function AuthPage() {
   const { toast, showToast } = useToast();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
     if (token) {
       router.push("/dashboard");
     } else {
@@ -115,12 +116,14 @@ export default function AuthPage() {
           },
         );
 
-        const token = response.data?.token;
-        if (token) {
+        const { token, refreshToken } = response.data;
+        if (token && refreshToken) {
           if (rememberMe) {
             localStorage.setItem("token", token);
+            localStorage.setItem("refreshToken", refreshToken);
           } else {
             sessionStorage.setItem("token", token);
+            sessionStorage.setItem("refreshToken", refreshToken);
           }
         }
 

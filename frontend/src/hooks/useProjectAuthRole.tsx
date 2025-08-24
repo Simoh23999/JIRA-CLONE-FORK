@@ -38,6 +38,7 @@ export function useProjectAuthRole(projectId: number | string) {
         if (decoded.exp && decoded.exp * 1000 < Date.now()) {
           console.warn("Token expiré");
           localStorage.removeItem("token");
+          sessionStorage.removeItem("token");
           router.push("/auth");
         } else {
           const email = decoded.email;

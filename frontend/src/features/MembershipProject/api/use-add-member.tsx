@@ -3,6 +3,9 @@ import axios from "axios";
 import { toast } from "sonner";
 import { z } from "zod";
 import { addProjectMemberSchema } from "../schemas";
+import { JwtPayload } from "@/types/jwt";
+import { refreshToken } from "@/lib/refreshToken";
+import { jwtDecode } from "jwt-decode";
 // import { useUpdateMemberProjectRole } from "./use-update-role";
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080";
@@ -15,8 +18,24 @@ export const useAddMemberToProject = () => {
     mutationFn: async (
       values: z.infer<typeof addProjectMemberSchema>,
     ): Promise<any> => {
-      const token =
+      const storedToken =
         localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      let token = storedToken;
+      if (token) {
+        try {
+          const decoded = jwtDecode<JwtPayload>(token);
+
+          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+            token = await refreshToken();
+          }
+        } catch (error) {
+          console.error("Invalid token:", error);
+          token = await refreshToken();
+        }
+      } else {
+        token = await refreshToken();
+      }
       if (!token) throw new Error("Token JWT manquant");
 
       // On utilise l'API backend : POST /api/projects/{projectId}/members?membershipId=...

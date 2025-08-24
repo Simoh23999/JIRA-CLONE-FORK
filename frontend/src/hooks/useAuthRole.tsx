@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
+// import {JwtPayload} from "@/types/jwt";
+import { refreshToken } from "@/lib/refreshToken";
 
 type JwtPayload = {
   roles: string;
@@ -24,39 +26,72 @@ export function useAuthRole(members?: Member[]) {
   const [userId, setUserId] = useState<string | number | null>(null);
   const router = useRouter();
 
+  // useEffect(() => {
+  //   const token =
+  //     localStorage.getItem("token") || sessionStorage.getItem("token");
+  //   if (!token) {
+  //     router.push("/auth");
+  //     return;
+  //   }
+
+  //   if (token && members) {
+  //     try {
+  //       const decoded = jwtDecode<JwtPayload>(token);
+
+  //       if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+  //         console.warn("Token expiré");
+  //         localStorage.removeItem("token");
+  //         router.push("/auth");
+  //       } else {
+  //         const email = decoded.email;
+  //         const member = members.find((m) => m.email === email) || null;
+
+  //         if (member) {
+  //           setUserId(member.userId);
+  //           setIsMember(true);
+  //           if (member.role === "ADMIN" || member.role === "OWNER") {
+  //             setIsAdminOrOwner(true);
+  //           }
+  //         }
+  //       }
+  //     } catch (err) {
+  //       console.error("Erreur lors du décodage du token", err);
+  //       router.push("/auth");
+  //     }
+  //   }
+  // }, [members, router]);
+
   useEffect(() => {
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
-    if (!token) {
-      router.push("/auth");
-      return;
-    }
+    async () => {
+      const storedToken =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
 
-    if (token && members) {
-      try {
-        const decoded = jwtDecode<JwtPayload>(token);
+      let token = storedToken;
+      if (token) {
+        try {
+          const decoded = jwtDecode<JwtPayload>(token);
 
-        if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-          console.warn("Token expiré");
-          localStorage.removeItem("token");
-          router.push("/auth");
-        } else {
-          const email = decoded.email;
-          const member = members.find((m) => m.email === email) || null;
-
-          if (member) {
-            setUserId(member.userId);
-            setIsMember(true);
-            if (member.role === "ADMIN" || member.role === "OWNER") {
-              setIsAdminOrOwner(true);
-            }
+          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+            token = await refreshToken();
           }
+        } catch (error) {
+          console.error("Invalid token:", error);
+          token = await refreshToken();
         }
-      } catch (err) {
-        console.error("Erreur lors du décodage du token", err);
-        router.push("/auth");
+      } else {
+        token = await refreshToken();
       }
-    }
+      const newDecoded = jwtDecode<JwtPayload>(token!);
+      const email = newDecoded.email;
+      const member = members?.find((m) => m.email === email) || null;
+      if (member) {
+        setUserId(member.userId);
+        setIsMember(true);
+        if (member.role === "ADMIN" || member.role === "OWNER") {
+          setIsAdminOrOwner(true);
+        }
+      }
+    };
   }, [members, router]);
 
   return { isAdminOrOwner, isMember, userId };

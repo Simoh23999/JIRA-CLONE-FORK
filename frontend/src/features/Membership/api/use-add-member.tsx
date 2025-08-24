@@ -3,7 +3,9 @@ import axios from "axios";
 import { toast } from "sonner";
 import { z } from "zod";
 import { addMemberSchema } from "../schemas";
-
+import { JwtPayload } from "@/types/jwt";
+import { refreshToken } from "@/lib/refreshToken";
+import { jwtDecode } from "jwt-decode";
 // Base URL (configurable via .env)
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9090";
 
@@ -14,8 +16,24 @@ export const useAddMemberToOrganization = () => {
     mutationFn: async (
       values: z.infer<typeof addMemberSchema>,
     ): Promise<any> => {
-      const token =
+      const storedToken =
         localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      let token = storedToken;
+      if (token) {
+        try {
+          const decoded = jwtDecode<JwtPayload>(token);
+
+          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+            token = await refreshToken();
+          }
+        } catch (error) {
+          console.error("Invalid token:", error);
+          token = await refreshToken();
+        }
+      } else {
+        token = await refreshToken();
+      }
 
       const response = await axios.post(
         `${baseURL}/api/memberships/add`,

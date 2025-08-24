@@ -44,6 +44,9 @@ import axios from "axios";
 import { translateSprintStatus } from "@/components/sprint/statusDisplay";
 import { useToast } from "../../hooks/useToast";
 import { Toast } from "../../components/ui/Toast";
+import { JwtPayload } from "@/types/jwt";
+import { refreshToken } from "@/lib/refreshToken";
+import { jwtDecode } from "jwt-decode";
 
 interface Sprint {
   id: string;
@@ -272,7 +275,7 @@ const EmptyState: React.FC<{
       projet agile.
     </p>
     <Button
-      className="bg-[#769ACA] hover:bg-[#799DCB] text-whit"
+      className="bg-[#769ACA] hover:bg-[#799DCB] text-white"
       onClick={onCreate}
     >
       <Plus className="mr-2 h-4 w-4" />
@@ -315,8 +318,25 @@ export default function SprintPage({
     const fetchSprints = async () => {
       try {
         setLoading(true);
-        const token =
+        const storedToken =
           localStorage.getItem("token") || sessionStorage.getItem("token");
+
+        let token = storedToken;
+        if (token) {
+          try {
+            const decoded = jwtDecode<JwtPayload>(token);
+
+            if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+              token = await refreshToken();
+            }
+          } catch (error) {
+            console.error("Invalid token:", error);
+            token = await refreshToken();
+          }
+        } else {
+          token = await refreshToken();
+        }
+
         const response = await axios.get(
           `http://localhost:9090/api/sprints/project/${projectId}`,
           {
@@ -361,8 +381,24 @@ export default function SprintPage({
   const handleStartSprint = async (sprint: Sprint) => {
     console.log("sprint id", sprint.id);
     try {
-      const token =
+      const storedToken =
         localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      let token = storedToken;
+      if (token) {
+        try {
+          const decoded = jwtDecode<JwtPayload>(token);
+
+          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+            token = await refreshToken();
+          }
+        } catch (error) {
+          console.error("Invalid token:", error);
+          token = await refreshToken();
+        }
+      } else {
+        token = await refreshToken();
+      }
       await axios.patch(
         `http://localhost:9090/api/sprints/${sprint.id}/start`,
         {},
@@ -387,8 +423,24 @@ export default function SprintPage({
 
   const handleFinishSprint = async (sprint: Sprint) => {
     try {
-      const token =
+      const storedToken =
         localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      let token = storedToken;
+      if (token) {
+        try {
+          const decoded = jwtDecode<JwtPayload>(token);
+
+          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+            token = await refreshToken();
+          }
+        } catch (error) {
+          console.error("Invalid token:", error);
+          token = await refreshToken();
+        }
+      } else {
+        token = await refreshToken();
+      }
       await axios.patch(
         `http://localhost:9090/api/sprints/${sprint.id}/complete`,
         {},
@@ -413,8 +465,24 @@ export default function SprintPage({
 
   const handleCloseSprint = async (sprint: Sprint) => {
     try {
-      const token =
+      const storedToken =
         localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      let token = storedToken;
+      if (token) {
+        try {
+          const decoded = jwtDecode<JwtPayload>(token);
+
+          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+            token = await refreshToken();
+          }
+        } catch (error) {
+          console.error("Invalid token:", error);
+          token = await refreshToken();
+        }
+      } else {
+        token = await refreshToken();
+      }
       await axios.patch(
         `http://localhost:9090/api/sprints/${sprint.id}/cancel`,
         {},

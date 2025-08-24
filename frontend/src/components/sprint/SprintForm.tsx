@@ -37,9 +37,11 @@ export interface Sprint {
   };
 }
 import { translateSprintStatus } from "@/components/sprint/statusDisplay";
-
+import { jwtDecode } from "jwt-decode";
+import { JwtPayload } from "@/types/jwt";
+import { refreshToken } from "@/lib/refreshToken";
 export type CreateSprintData = Omit<Sprint, "id" | "progress" | "tasks"> & {
-  status?: Sprint["status"]; // Optionnel pour la création
+  status?: Sprint["status"];
 };
 
 export type UpdateSprintData = Pick<Sprint, "id"> &
@@ -55,7 +57,6 @@ export interface SprintFormProps {
   onCancel: () => void;
 }
 
-// Interface pour les erreurs de validation
 interface ValidationErrors {
   name?: string;
   startDate?: string;
@@ -63,7 +64,6 @@ interface ValidationErrors {
   general?: string;
 }
 
-// Données par défaut pour un nouveau sprint
 const defaultFormData = {
   name: "",
   description: "",
@@ -72,7 +72,6 @@ const defaultFormData = {
   endDate: "",
 };
 
-// Options de période disponibles
 const periodOptions = [
   { value: "1 semaine", label: "1 semaine", weeks: 1 },
   { value: "2 semaines", label: "2 semaines", weeks: 2 },
@@ -107,7 +106,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // **SOLUTION CRITIQUE**: Fonction de reset propre et isolée
+  // fonction de reset propre et isolée
   const resetFormState = useCallback(() => {
     setFormData(defaultFormData);
     setErrors({});
@@ -115,14 +114,13 @@ export const SprintForm: React.FC<SprintFormProps> = ({
     setIsLoading(false);
   }, []);
 
-  // **SOLUTION CRITIQUE**: Initialiser UNIQUEMENT à l'ouverture
+  // Initialiser UNIQUEMENT à l'ouverture
   useEffect(() => {
     if (open) {
-      // Reset d'abord pour éviter les états corrompus
       resetFormState();
 
       if (mode === "edit" && sprint) {
-        // Calculer la période basée sur les dates existantes
+        // calc period
         const startDate = new Date(sprint.startDate);
         const endDate = new Date(sprint.endDate);
         const diffInDays = Math.ceil(
@@ -142,13 +140,13 @@ export const SprintForm: React.FC<SprintFormProps> = ({
     }
   }, [open, mode, sprint, resetFormState]);
 
-  // **SOLUTION CRITIQUE**: Gérer les changements de champs de manière isolée
+  // gerer les changements de champs de manière isole
   const handleFieldChange = useCallback(
     (field: string, value: string) => {
       setFormData((prevData) => {
         const newFormData = { ...prevData, [field]: value };
 
-        // Calculer automatiquement la date de fin si date de début ou période change
+        // Calculer automatiquement la date de fin si date de debut ou periode change
         if (field === "startDate" || field === "period") {
           const endDate = calculateEndDate(
             field === "startDate" ? value : newFormData.startDate,
@@ -162,7 +160,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
 
       setHasUnsavedChanges(true);
 
-      // Effacer l'erreur du champ modifié
+      // effacer l'erreur du champ modifie
       if (errors[field as keyof ValidationErrors]) {
         setErrors((prev) => ({ ...prev, [field]: undefined }));
       }
@@ -212,7 +210,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
     return date.toISOString().split("T")[0];
   };
 
-  // **SOLUTION CRITIQUE**: Soumission du formulaire avec gestion d'erreur robuste
+  // soumission du formulaire avec gestion d'erreur
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -239,8 +237,27 @@ export const SprintForm: React.FC<SprintFormProps> = ({
         // };
         console.log("==========> mode : ", isEditMode);
         let result;
-        const token =
+
+        const storedToken =
           localStorage.getItem("token") || sessionStorage.getItem("token");
+
+        let token = storedToken;
+
+        if (token) {
+          try {
+            const decoded = jwtDecode<JwtPayload>(token);
+
+            if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+              token = await refreshToken();
+            }
+          } catch (error) {
+            console.error("Invalid token:", error);
+            token = await refreshToken();
+          }
+        } else {
+          token = await refreshToken();
+        }
+
         // if (isEditMode && sprint?.id) {
         if (isEditMode && sprint?.id) {
           // Modifier sprint existant
@@ -262,7 +279,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
           );
           result = response.data;
         } else {
-          // Créer nouveau sprint
+          // Creer nouveau sprint
           console.log("description > ", formData.description.trim());
           const response = await axios.post(
             "http://localhost:9090/api/sprints",
@@ -284,7 +301,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
         }
         console.log("==========> resultat : ", result);
 
-        // **SOLUTION CRITIQUE**: Reset avant succès pour éviter les conflits
+        // reset avant succes pour eviter les conflits
         const new_result = {
           ...result,
           status: translateSprintStatus(result.status),
@@ -308,7 +325,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
     [formData, validateForm, sprint, onSuccess, resetFormState],
   );
 
-  // **SOLUTION CRITIQUE**: Gestion d'annulation simplifiée et robuste
+  // gestion d'annulation
   const handleCancel = useCallback(() => {
     if (hasUnsavedChanges) {
       const confirmed = window.confirm(
@@ -317,7 +334,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
       if (!confirmed) return;
     }
 
-    // **SOLUTION CRITIQUE**: Reset immédiat et fermeture
+    // reset et fermeture
     resetFormState();
     onCancel();
   }, [hasUnsavedChanges, onCancel, resetFormState]);
@@ -329,12 +346,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
     : "Créer Sprint";
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={() => {
-        /* Pas de gestion ici - uniquement par les boutons */
-      }}
-    >
+    <Dialog open={open} onOpenChange={(open) => !open && handleCancel()}>
       <DialogContent
         className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto"
         style={{ backgroundColor: "#f7fbfc" }}

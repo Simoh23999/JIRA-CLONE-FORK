@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
-
+import { JwtPayload } from "@/types/jwt";
+import { refreshToken } from "@/lib/refreshToken";
+import { jwtDecode } from "jwt-decode";
 interface PasswordValidationErrors {
   currentPassword?: string;
   newPassword?: string;
@@ -68,8 +70,24 @@ export const usePasswordModal = () => {
 
     if (isValid) {
       try {
-        const token =
+        const storedToken =
           localStorage.getItem("token") || sessionStorage.getItem("token");
+
+        let token = storedToken;
+        if (token) {
+          try {
+            const decoded = jwtDecode<JwtPayload>(token);
+
+            if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+              token = await refreshToken();
+            }
+          } catch (error) {
+            console.error("Invalid token:", error);
+            token = await refreshToken();
+          }
+        } else {
+          token = await refreshToken();
+        }
         const response = await axios.put(
           "http://localhost:9090/api/me/password",
           {

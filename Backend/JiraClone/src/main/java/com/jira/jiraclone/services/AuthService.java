@@ -2,9 +2,12 @@ package com.jira.jiraclone.services;
 
 import com.jira.jiraclone.dtos.AuthRequest;
 import com.jira.jiraclone.dtos.AuthResponse;
+import com.jira.jiraclone.dtos.RefreshTokenRequest;
 import com.jira.jiraclone.dtos.RegisterRequest;
+import com.jira.jiraclone.entities.RefreshToken;
 import com.jira.jiraclone.entities.User;
 import com.jira.jiraclone.entities.UserRole;
+import com.jira.jiraclone.services.RefreshTokenService;
 import com.jira.jiraclone.repositories.UserRepository;
 import com.jira.jiraclone.repositories.RoleRepository;
 import com.jira.jiraclone.security.UserPrincipal;
@@ -27,15 +30,18 @@ public class AuthService {
     private final RoleRepository userRoleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
 
     public AuthService(UserRepository userRepository, RoleRepository userRoleRepository,
                        BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
+                       RefreshTokenService refreshTokenService,
                        JwtService jwtService) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.refreshTokenService = refreshTokenService;
         this.jwtService = jwtService;
     }
 
@@ -98,12 +104,12 @@ public class AuthService {
 
             if (authentication.isAuthenticated()) {
                 UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
-                // Génération du token avec toutes les informations utilisateur
+                RefreshToken refreshToken = refreshTokenService.createRefreshToken(userPrincipal.getEmail());
                 String token = jwtService.generateToken(userPrincipal);
 
                 AuthResponse response = AuthResponse.builder()
                         .token(token)
+                        .refreshToken(refreshToken.getToken())
                         .message("Login successful")
                         .success(true)
                         .build();
@@ -111,6 +117,7 @@ public class AuthService {
             } else {
                 AuthResponse response = AuthResponse.builder()
                         .token(null)
+                        .refreshToken(null)
                         .message("Authentication failed")
                         .success(false)
                         .build();
@@ -120,6 +127,7 @@ public class AuthService {
         } catch (BadCredentialsException e) {
             AuthResponse response = AuthResponse.builder()
                     .token(null)
+                    .refreshToken(null)
                     .message("Invalid email or password")
                     .success(false)
                     .build();
@@ -127,6 +135,7 @@ public class AuthService {
         } catch (AuthenticationException e) {
             AuthResponse response = AuthResponse.builder()
                     .token(null)
+                    .refreshToken(null)
                     .message("Authentication failed: " + e.getMessage())
                     .success(false)
                     .build();
@@ -134,10 +143,71 @@ public class AuthService {
         } catch (Exception e) {
             AuthResponse response = AuthResponse.builder()
                     .token(null)
+                    .refreshToken(null)
                     .message("Login failed: " + e.getMessage())
                     .success(false)
                     .build();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+        try {
+            String requestRefreshToken = request.getRefreshToken();
+
+            return refreshTokenService.findByToken(requestRefreshToken)
+                    .map(refreshTokenService::verifyExpiration)
+                    .map(RefreshToken::getUser)
+                    .map(user -> {
+                        UserPrincipal userPrincipal = new UserPrincipal(user);
+                        String newAccessToken = jwtService.generateToken(userPrincipal);
+
+                        return AuthResponse.builder()
+                                .token(newAccessToken)
+                                .refreshToken(requestRefreshToken) // Garder le même refresh token
+                                .message("Token refreshed successfully")
+                                .success(true)
+                                .build();
+                    })
+                    .orElseGet(() -> AuthResponse.builder()
+                            .token(null)
+                            .refreshToken(null)
+                            .message("Refresh token is not valid")
+                            .success(false)
+                            .build());
+
+        } catch (Exception e) {
+            return AuthResponse.builder()
+                    .token(null)
+                    .refreshToken(null)
+                    .message("Refresh token error: " + e.getMessage())
+                    .success(false)
+                    .build();
+        }
+    }
+
+    // NOUVELLE MÉTHODE : Logout Logic
+    public AuthResponse logout(RefreshTokenRequest request) {
+        try {
+            refreshTokenService.findByToken(request.getRefreshToken())
+                    .ifPresent(refreshToken -> {
+                        refreshTokenService.deleteByUserEmail(refreshToken.getUser().getEmail());
+                    });
+
+            return AuthResponse.builder()
+                    .token(null)
+                    .refreshToken(null)
+                    .message("Logout successful")
+                    .success(true)
+                    .build();
+
+        } catch (Exception e) {
+            return AuthResponse.builder()
+                    .token(null)
+                    .refreshToken(null)
+                    .message("Logout error: " + e.getMessage())
+                    .success(false)
+                    .build();
         }
     }
 }

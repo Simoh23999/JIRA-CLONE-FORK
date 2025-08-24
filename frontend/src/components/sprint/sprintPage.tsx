@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import {
   Search,
   Plus,
@@ -39,6 +40,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/sprint/sprintSelect";
+import axios from "axios";
+import { translateSprintStatus } from "@/components/sprint/statusDisplay";
+import { useToast } from "../../hooks/useToast";
+import { Toast } from "../../components/ui/Toast";
 
 interface Sprint {
   id: string;
@@ -124,13 +129,15 @@ const getStatusColor = (status: Sprint["status"]) => {
 
 const SprintCard: React.FC<{
   sprint: Sprint;
+  isProjectOwner: boolean;
   onEdit: (sprint: Sprint) => void;
   onClose?: (sprint: Sprint) => void;
   onStart?: (sprint: Sprint) => void;
   onFinish?: (sprint: Sprint) => void;
-}> = ({ sprint, onEdit, onClose, onStart, onFinish }) => {
+}> = ({ sprint, isProjectOwner, onEdit, onClose, onStart, onFinish }) => {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    // return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("fr-FR", {
       month: "short",
       day: "numeric",
     });
@@ -172,33 +179,37 @@ const SprintCard: React.FC<{
                   <Eye className="mr-2 h-4 w-4" />
                   Voir les détails
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onEdit(sprint)}>
-                  <Edit3 className="mr-2 h-4 w-4" />
-                  Modifier le sprint
-                </DropdownMenuItem>
-                {sprint.status === "Planification" && (
-                  <DropdownMenuItem onClick={() => onStart?.(sprint)}>
-                    <PlayCircle className="mr-2 h-4 w-4" />
-                    Démarrer le sprint
-                  </DropdownMenuItem>
-                )}
-                {sprint.status === "Actif" && (
+                {isProjectOwner && (
                   <>
-                    <DropdownMenuItem onClick={() => onFinish?.(sprint)}>
-                      <StopCircle className="mr-2 h-4 w-4" />
-                      Terminer le sprint
+                    <DropdownMenuItem onClick={() => onEdit(sprint)}>
+                      <Edit3 className="mr-2 h-4 w-4" />
+                      Modifier le sprint
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onClose?.(sprint)}>
-                      <XCircle className="mr-2 h-4 w-4" />
-                      Fermer le sprint
-                    </DropdownMenuItem>
+                    {sprint.status === "Planification" && (
+                      <DropdownMenuItem onClick={() => onStart?.(sprint)}>
+                        <PlayCircle className="mr-2 h-4 w-4" />
+                        Démarrer le sprint
+                      </DropdownMenuItem>
+                    )}
+                    {sprint.status === "Actif" && (
+                      <>
+                        <DropdownMenuItem onClick={() => onFinish?.(sprint)}>
+                          <StopCircle className="mr-2 h-4 w-4" />
+                          Terminer le sprint
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onClose?.(sprint)}>
+                          <XCircle className="mr-2 h-4 w-4" />
+                          Fermer le sprint
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    {sprint.status === "Fermé" && (
+                      <DropdownMenuItem onClick={() => onStart?.(sprint)}>
+                        <PlayCircle className="mr-2 h-4 w-4" />
+                        Démarrer le sprint
+                      </DropdownMenuItem>
+                    )}
                   </>
-                )}
-                {sprint.status === "Fermé" && (
-                  <DropdownMenuItem onClick={() => onStart?.(sprint)}>
-                    <PlayCircle className="mr-2 h-4 w-4" />
-                    Démarrer le sprint
-                  </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -235,9 +246,9 @@ const SprintCard: React.FC<{
             <TrendingUp className="h-4 w-4 text-gray-600" />
             <span className="text-gray-600">Tâches:</span>
           </div>
-          <span className="font-medium text-gray-900">
+          {/* <span className="font-medium text-gray-900">
             {sprint.tasks.completed}/{sprint.tasks.total}
-          </span>
+          </span> */}
         </div>
       </CardContent>
     </Card>
@@ -271,14 +282,19 @@ const EmptyState: React.FC<{
 );
 interface SprintPageProps {
   title: string;
+  isProjectOwner: boolean;
   onTaskClick: (taskId: string) => void;
   isFullWidth?: boolean;
 }
 export default function SprintPage({
   title,
+  isProjectOwner,
   onTaskClick,
   isFullWidth = false,
 }: SprintPageProps) {
+  const params = useParams();
+  const { toast, showToast } = useToast();
+  const projectId = params.projectId as string;
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("date");
@@ -287,11 +303,48 @@ export default function SprintPage({
     "create",
   );
   const [selectedSprint, setSelectedSprint] = useState<Sprint | undefined>();
-  const [sprints, setSprints] = useState<Sprint[]>(mockSprints);
+  //   const [sprints, setSprints] = useState<Sprint[]>(mockSprints);
+  const [sprints, setSprints] = useState<Sprint[]>([]);
+  const [loading, setLoading] = useState(true);
+  //   useEffect(() => {
+  //     console.log("====|> State sprints mis à jour:", sprints);
+  //     // setSprints(sprints);
+  //   }, [sprints]);
+
   useEffect(() => {
-    console.log("====|> State sprints mis à jour:", sprints);
-    // setSprints(sprints);
-  }, [sprints]);
+    const fetchSprints = async () => {
+      try {
+        setLoading(true);
+        const token =
+          localStorage.getItem("token") || sessionStorage.getItem("token");
+        const response = await axios.get(
+          `http://localhost:9090/api/sprints/project/${projectId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+        //   console.log("raw response ",response);
+        console.log("response : ", response.data);
+        const new_sprints =
+          response.data.map((sprint: Sprint) => ({
+            ...sprint,
+            status: translateSprintStatus(sprint.status),
+          })) || [];
+
+        setSprints(new_sprints);
+        // setSprints(response.data || []);
+      } catch (error) {
+        console.error("Erreur lors du chargement des sprints:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (projectId) {
+      fetchSprints();
+    }
+  }, [projectId]);
+
   // Fonctions de gestion du SprintForm
   const handleCreateSprint = () => {
     setSprintFormMode("create");
@@ -304,29 +357,84 @@ export default function SprintPage({
     setSelectedSprint(sprint);
     setSprintFormOpen(true);
   };
-  // À ajouter avec handleEditSprint
-  const handleStartSprint = (sprint: Sprint) => {
-    setSprints((prevSprints) =>
-      prevSprints.map((s) =>
-        s.id === sprint.id ? { ...s, status: "Actif" as const } : s,
-      ),
-    );
+
+  const handleStartSprint = async (sprint: Sprint) => {
+    console.log("sprint id", sprint.id);
+    try {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.patch(
+        `http://localhost:9090/api/sprints/${sprint.id}/start`,
+        {},
+        {
+          headers: {
+            // Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setSprints((prevSprints) =>
+        prevSprints.map((s) =>
+          s.id === sprint.id ? { ...s, status: "Actif" as const } : s,
+        ),
+      );
+    } catch (error: any) {
+      console.error("Erreur lors du démarrage du sprint:", error);
+      showToast("error", error.message);
+      // khas toast hna
+    }
   };
 
-  const handleFinishSprint = (sprint: Sprint) => {
-    setSprints((prevSprints) =>
-      prevSprints.map((s) =>
-        s.id === sprint.id ? { ...s, status: "Terminé" as const } : s,
-      ),
-    );
+  const handleFinishSprint = async (sprint: Sprint) => {
+    try {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.patch(
+        `http://localhost:9090/api/sprints/${sprint.id}/complete`,
+        {},
+        {
+          headers: {
+            // Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setSprints((prevSprints) =>
+        prevSprints.map((s) =>
+          s.id === sprint.id ? { ...s, status: "Terminé" as const } : s,
+        ),
+      );
+    } catch (error: any) {
+      console.error("Erreur lors de la finalisation du sprint:", error);
+      showToast("error", error.message);
+      // ta hna
+    }
   };
 
-  const handleCloseSprint = (sprint: Sprint) => {
-    setSprints((prevSprints) =>
-      prevSprints.map((s) =>
-        s.id === sprint.id ? { ...s, status: "Fermé" as const } : s,
-      ),
-    );
+  const handleCloseSprint = async (sprint: Sprint) => {
+    try {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.patch(
+        `http://localhost:9090/api/sprints/${sprint.id}/cancel`,
+        {},
+        {
+          headers: {
+            // Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setSprints((prevSprints) =>
+        prevSprints.map((s) =>
+          s.id === sprint.id ? { ...s, status: "Fermé" as const } : s,
+        ),
+      );
+    } catch (error: any) {
+      console.error("Erreur lors de la fermeture du sprint:", error);
+      showToast("error", error.message);
+      // ta hnaa
+    }
   };
 
   const handleSprintFormSuccess = (sprintData: SprintType) => {
@@ -384,7 +492,7 @@ export default function SprintPage({
 
         case "status":
           // Tri par statut avec ordre de priorité logique
-          const statusOrder = {
+          const statusOrder: Record<string, number> = {
             actif: 1, // Sprints en cours
             planification: 2, // Sprints à venir
             terminé: 3, // Sprints finis
@@ -407,18 +515,20 @@ export default function SprintPage({
       }
     });
 
-  const activeSprints = mockSprints.filter((s) => s.status === "Actif").length;
-  const completedSprints = mockSprints.filter(
-    (s) => s.status === "Terminé",
-  ).length;
-  const totalSprints = mockSprints.length;
-  const totalTasks = mockSprints.reduce(
-    (sum, sprint) => sum + sprint.tasks.total,
-    0,
-  );
+  const activeSprints = sprints.filter((s) => s.status === "Actif").length;
+  const completedSprints = sprints.filter((s) => s.status === "Terminé").length;
+  const totalSprints = sprints.length;
+  //   const totalTasks = sprints.reduce(
+  //     (sum, sprint) => sum + sprint.tasks.total,
+  //     0,
+  //   );
 
+  console.log(">>>>>>>>>>>>> role dans sprint : ", isProjectOwner);
   return (
     <div className="min-h-screen bg-slate-50">
+      {toast && (
+        <Toast type={toast.type} message={toast.message} onClose={() => {}} />
+      )}
       {/* Header */}
       <div className="border-b border-gray-200 bg-white">
         <div className="container mx-auto px-6 py-4">
@@ -432,16 +542,18 @@ export default function SprintPage({
                 <span className="text-gray-900 font-medium">Sprints</span>
               </nav> */}
               <h1 className="text-3xl font-bold text-gray-900">
-                Sprints du projet {title}
+                Sprints du projet
               </h1>
             </div>
-            <Button
-              className="bg-[#769ACA] hover:bg-[#799DCB] text-white font-medium"
-              onClick={handleCreateSprint}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Créer un sprint
-            </Button>
+            {isProjectOwner && (
+              <Button
+                className="bg-[#769ACA] hover:bg-[#799DCB] text-white font-medium"
+                onClick={handleCreateSprint}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Créer un sprint
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -509,7 +621,7 @@ export default function SprintPage({
                     Total des tâches
                   </p>
                   <p className="text-3xl font-bold text-gray-900">
-                    {totalTasks}
+                    {/* {totalTasks} */}
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-[#F0F6FB] rounded-lg flex items-center justify-center">
@@ -583,6 +695,7 @@ export default function SprintPage({
               <SprintCard
                 key={sprint.id}
                 sprint={sprint}
+                isProjectOwner={isProjectOwner}
                 onEdit={handleEditSprint}
                 onClose={handleCloseSprint}
                 onStart={handleStartSprint}
@@ -604,7 +717,7 @@ export default function SprintPage({
       <SprintForm
         mode={sprintFormMode}
         sprint={selectedSprint}
-        projectId="web-application"
+        projectId={projectId}
         open={sprintFormOpen}
         onSuccess={handleSprintFormSuccess}
         onCancel={handleSprintFormCancel}

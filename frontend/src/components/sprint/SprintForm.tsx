@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/sprint/sprintButton";
+import { useParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,6 +36,14 @@ export interface Sprint {
     total: number;
   };
 }
+import { translateSprintStatus } from "@/components/sprint/statusDisplay";
+
+export type CreateSprintData = Omit<Sprint, "id" | "progress" | "tasks"> & {
+  status?: Sprint["status"]; // Optionnel pour la création
+};
+
+export type UpdateSprintData = Pick<Sprint, "id"> &
+  Partial<Omit<Sprint, "id" | "progress" | "tasks">>;
 
 // Props du composant
 export interface SprintFormProps {
@@ -218,34 +227,32 @@ export const SprintForm: React.FC<SprintFormProps> = ({
       setErrors({});
 
       try {
-        // Simuler une requête API
-        // await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const sprintData: Sprint = {
-          id: sprint?.id || `sprint-${Date.now()}`,
-          name: formData.name.trim(),
-          description: formData.description.trim() || undefined,
-          startDate: formData.startDate,
-          endDate: formData.endDate,
-          status: sprint?.status || "Planification",
-          progress: sprint?.progress || 0,
-          tasks: sprint?.tasks || { completed: 0, total: 0 },
-        };
+        // const sprintData: UpdateSprintData = {
+        //   // id: sprint?.id || `sprint-${Date.now()}`,
+        //   name: formData.name.trim(),
+        //   description: formData.description.trim() || undefined,
+        //   startDate: formData.startDate,
+        //   endDate: formData.endDate,
+        //   status: sprint?.status || "Planification",
+        //   progress: sprint?.progress || 0,
+        //   tasks: sprint?.tasks || { completed: 0, total: 0 },
+        // };
         console.log("==========> mode : ", isEditMode);
         let result;
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
+        // if (isEditMode && sprint?.id) {
         if (isEditMode && sprint?.id) {
           // Modifier sprint existant
           const response = await axios.put(
             `http://localhost:9090/api/sprints/${sprint.id}`,
             {
-              name: sprintData.name,
-              descrption: sprintData.description,
-              projectId: 1,
-              startDate: sprintData.startDate,
-              endDate: sprintData.endDate,
-              status: sprintData.status,
+              name: formData.name.trim(),
+              description: formData.description.trim() || undefined,
+              projectId: projectId,
+              startDate: formData.startDate,
+              endDate: formData.endDate,
+              status: sprint.status,
             },
             {
               headers: {
@@ -256,19 +263,20 @@ export const SprintForm: React.FC<SprintFormProps> = ({
           result = response.data;
         } else {
           // Créer nouveau sprint
+          console.log("description > ", formData.description.trim());
           const response = await axios.post(
             "http://localhost:9090/api/sprints",
             {
-              name: sprintData.name,
-              descrption: sprintData.description,
-              projectId: 1,
-              startDate: sprintData.startDate,
-              endDate: sprintData.endDate,
+              name: formData.name.trim(),
+              description: formData.description.trim() || undefined,
+              projectId: projectId,
+              startDate: formData.startDate,
+              endDate: formData.endDate,
             },
             {
               headers: {
                 // Authorization: `Bearer ${token}`,
-                Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6IlJPTEVfTUVNQkVSIiwiZW1haWwiOiJnbXBAZG9tYWluZS5jb20iLCJ1c2VybmFtZSI6ImF1dHJlX25vbSIsInN1YiI6ImdtcEBkb21haW5lLmNvbSIsImlhdCI6MTc1NTUxOTU2NSwiZXhwIjoxNzU1NTI2NzY1fQ.aMOGUctRqvMqifCFELXbFLdUoBi2l03UKw-_VJCIHhY`,
+                Authorization: `Bearer ${token}`,
               },
             },
           );
@@ -277,13 +285,22 @@ export const SprintForm: React.FC<SprintFormProps> = ({
         console.log("==========> resultat : ", result);
 
         // **SOLUTION CRITIQUE**: Reset avant succès pour éviter les conflits
+        const new_result = {
+          ...result,
+          status: translateSprintStatus(result.status),
+        };
+
         resetFormState();
         console.log("==========> resultat2 : ", result);
-        onSuccess(sprintData);
-      } catch (error) {
+        onSuccess(new_result);
+      } catch (error: any) {
         console.warn(error);
+        const message =
+          error.response?.data?.message ||
+          error.message ||
+          "Une erreur s'est produite, veuillez réessayer";
         setErrors({
-          general: "Une erreur s'est produite, veuillez réessayer",
+          general: message,
         });
         setIsLoading(false);
       }

@@ -57,7 +57,8 @@ export default function AuthPage() {
   const { toast, showToast } = useToast();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
     if (token) {
       router.push("/dashboard");
     } else {

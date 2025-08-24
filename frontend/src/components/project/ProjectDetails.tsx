@@ -137,6 +137,7 @@ const ProjectDetails = ({ project, member }: Props) => {
       toast.error("Erreur lors de la suppression du projet");
     }
   };
+  console.log(">>>>>>>>>>>>> role dans project details : ", isProjectOwner);
 
   return (
     <div className="space-y-8">
@@ -161,6 +162,7 @@ const ProjectDetails = ({ project, member }: Props) => {
         <TabsContent value="Sprints">
           <SprintPage
             title="Sprint"
+            isProjectOwner={isProjectOwner}
             onTaskClick={handleTaskClick}
             isFullWidth
           />

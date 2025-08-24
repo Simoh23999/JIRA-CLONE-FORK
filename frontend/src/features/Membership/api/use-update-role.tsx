@@ -20,7 +20,8 @@ export const useUpdateMemberRole = () => {
       targetUserId,
       newRole,
     }: UpdateMemberRolePayload): Promise<any> => {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
 
       const response = await axios.put(
         `${baseURL}/api/organizations/${organizationId}/members/${targetUserId}/role`,

@@ -24,7 +24,8 @@ export function useProjectAuthRole(projectId: number | string) {
   const { data: projectMembers } = useGetProjectMembers(projectId);
   console.log("project id  members ====", projectMembers);
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
     if (!token) {
       router.push("/auth");
       return;
@@ -33,7 +34,7 @@ export function useProjectAuthRole(projectId: number | string) {
     if (token && projectMembers) {
       try {
         const decoded = jwtDecode<JwtPayload>(token);
-
+        console.log("============== > decoded : ", decoded);
         if (decoded.exp && decoded.exp * 1000 < Date.now()) {
           console.warn("Token expiré");
           localStorage.removeItem("token");
@@ -41,6 +42,8 @@ export function useProjectAuthRole(projectId: number | string) {
         } else {
           const email = decoded.email;
           const member = projectMembers.find((m) => m.email === email);
+          console.log("=========> membre : ", member);
+          console.log("======> email :", email);
           if (member) {
             setUserProjectMembershipId(member.id);
             setIsProjectMember(

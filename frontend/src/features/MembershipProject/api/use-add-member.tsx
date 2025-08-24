@@ -15,7 +15,8 @@ export const useAddMemberToProject = () => {
     mutationFn: async (
       values: z.infer<typeof addProjectMemberSchema>,
     ): Promise<any> => {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) throw new Error("Token JWT manquant");
 
       // On utilise l'API backend : POST /api/projects/{projectId}/members?membershipId=...

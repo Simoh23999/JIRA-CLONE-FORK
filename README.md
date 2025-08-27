@@ -72,6 +72,6 @@ L’application sera accessible sur [http://localhost:3000](http://localhost:300
 
 ## Liens de documentation
 
-[Guide de développement Frontend](./Docs/FRONTEND_DEVELOPMENT.md)
-[Guide de développement Backend](./Docs/BACKEND_DEVELOPMENT.md)
+- [Guide de développement Frontend](./Docs/FRONTEND_DEVELOPMENT.md)
+- [Guide de développement Backend](./Docs/BACKEND_DEVELOPMENT.md)
 

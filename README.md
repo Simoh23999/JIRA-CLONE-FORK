@@ -58,7 +58,7 @@ Avant d’installer et lancer le projet, assurez-vous d’avoir :
 Cloner le dépôt :
 
 ```bash
-git clone https://github.com/your-org/taskflow.git
+git clone https://github.com/AH-Digital-go/DEVPFA-SQUAD-JIRA-CLONE.git
 cd taskflow
 ```
 ### Lancer le Frontend (Next.js)

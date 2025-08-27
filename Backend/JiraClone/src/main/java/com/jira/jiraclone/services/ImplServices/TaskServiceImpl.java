@@ -231,4 +231,77 @@ public class TaskServiceImpl implements ITaskService {
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
+    /*
+     * updateTask :
+     * - Seul le PROJECT_OWNER peut mettre à jour une tâche
+     * - Peut modifier titre, description, sprint, etc.
+     */
+    @Override
+    @Transactional
+    public TaskResponseDto updateTask(Long taskId, TaskRequestDto dto, User requester) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Tâche introuvable."));
+
+        Project project = task.getProject();
+
+        // vérifier que requester est OWNER
+        Membership requesterMembershipInOrg = membershipRepository
+                .findByUserAndOrganization(requester, project.getOrganization())
+                .orElseThrow(() -> new UnauthorizedException("Vous n'êtes pas membre de l'organisation."));
+
+        ProjectMembership requesterPM = projectMembershipRepository
+                .findByProjectAndMembership(project, requesterMembershipInOrg)
+                .orElseThrow(() -> new UnauthorizedException("Vous n'êtes pas membre du projet."));
+
+        if (requesterPM.getRoleInProject() != ProjectRole.PROJECT_OWNER) {
+            throw new UnauthorizedException("Seul le PROJECT_OWNER peut mettre à jour une tâche.");
+        }
+
+        // mise à jour des champs
+        if (dto.getTitle() != null) task.setTitle(dto.getTitle());
+        if (dto.getDescription() != null) task.setDescription(dto.getDescription());
+
+        if (dto.getSprintId() != null) {
+            Sprint sprint = sprintRepository.findById(dto.getSprintId())
+                    .orElseThrow(() -> new NotFoundException("Sprint introuvable."));
+            if (!sprint.getProject().getId().equals(project.getId())) {
+                throw new UnauthorizedException("Le sprint ne fait pas partie de ce projet.");
+            }
+            task.setSprint(sprint);
+        }
+
+        task.setUpdatedAt(LocalDateTime.now());
+        Task saved = taskRepository.save(task);
+        return toDto(saved);
+    }
+
+    /*
+     * deleteTask :
+     * - Seul le PROJECT_OWNER peut supprimer une tâche
+     */
+    @Override
+    @Transactional
+    public void deleteTask(Long taskId, User requester) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Tâche introuvable."));
+
+        Project project = task.getProject();
+
+        // vérifier que requester est OWNER
+        Membership requesterMembershipInOrg = membershipRepository
+                .findByUserAndOrganization(requester, project.getOrganization())
+                .orElseThrow(() -> new UnauthorizedException("Vous n'êtes pas membre de l'organisation."));
+
+        ProjectMembership requesterPM = projectMembershipRepository
+                .findByProjectAndMembership(project, requesterMembershipInOrg)
+                .orElseThrow(() -> new UnauthorizedException("Vous n'êtes pas membre du projet."));
+
+        if (requesterPM.getRoleInProject() != ProjectRole.PROJECT_OWNER) {
+            throw new UnauthorizedException("Seul le PROJECT_OWNER peut supprimer une tâche.");
+        }
+
+        taskRepository.delete(task);
+    }
+
+
 }

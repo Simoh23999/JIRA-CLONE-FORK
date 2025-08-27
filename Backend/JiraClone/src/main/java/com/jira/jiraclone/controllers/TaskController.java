@@ -86,4 +86,26 @@ public class TaskController {
         List<TaskResponseDto> list = taskService.getTasksByProject(projectId, requester);
         return ResponseEntity.ok(list);
     }
+    // 6. Mettre à jour une tâche (PROJECT_OWNER uniquement)
+    @PutMapping("/tasks/{taskId}")
+    public ResponseEntity<TaskResponseDto> updateTask(
+            @PathVariable Long taskId,
+            @Valid @RequestBody TaskRequestDto dto,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        User requester = userPrincipal.getUser();
+        TaskResponseDto updated = taskService.updateTask(taskId, dto, requester);
+        return ResponseEntity.ok(updated);
+    }
+
+    // 7. Supprimer une tâche (PROJECT_OWNER uniquement)
+    @DeleteMapping("/tasks/{taskId}")
+    public ResponseEntity<Void> deleteTask(
+            @PathVariable Long taskId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        User requester = userPrincipal.getUser();
+        taskService.deleteTask(taskId, requester);
+        return ResponseEntity.noContent().build();
+    }
 }

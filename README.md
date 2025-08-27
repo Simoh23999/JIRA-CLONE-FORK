@@ -1,34 +1,77 @@
-# bach tb9a dima a jour m3a l`main`
+# TaskFlow 
 
-drari maghadich nb9a n9abl kola push w les changement  li  fiha, w bach maykonoch des conflits 7awlo dima tkono a jour m3a l`main` 9bl kola push
+> **Dernière mise à jour :** Août 2025  
+> **Version :** 0.1.0  
 
-hna ghatl9aw 2 methodes kifach tkono a jour bl2ijabiyat w silbiyat dyalhom :
+TaskFlow est un **clone de Jira** construit avec un **frontend Next.js** et un **backend Spring Boot**, conçu pour fournir des fonctionnalités avancées de gestion de projet telles que le suivi des taches, la planification des sprints, la gestion du backlog et la collaboration en équipe.  
+Il permet aux équipes d’organiser les tâches, suivre l’avancement et gérer les flux de travail de manière efficace.
 
-## Option 1: merge `main` flbranch fach khdam
+---
+
+## Aperçu du projet
+
+**Utilisateurs cibles :**  
+- Toute personne ayant un projet et souhaitant le gérer de manière efficace.
+
+**Fonctionnalités principales :**  
+- Authentification et rôles utilisateurs  
+- Création et gestion de projets  
+- gestion des permissions RBAC (Role-based access control) 
+- Création, attribution et suivi des tâches/tickets  
+- Planification de sprint et gestion du backlog  
+- Tableau Kanban pour visualiser les tâches  
+
+---
+
+## Stack technique
+
+### Frontend
+- [Next.js](https://nextjs.org/) (v15+)  
+- [React](https://reactjs.org/) (v18+)  
+- [TypeScript](https://www.typescriptlang.org/)  
+- [TailwindCSS](https://tailwindcss.com/) pour le style  
+- [Radix UI](https://www.radix-ui.com/) pour les composants UI
+### Backend
+- [Spring Boot](https://spring.io/projects/spring-boot) (v3+)  
+- [Java](https://www.oracle.com/java/) (17+)  
+- [Spring Security](https://spring.io/projects/spring-security) pour la sécurité  
+- [MySQL](https://www.mysql.com/) via [XAMPP](https://www.apachefriends.org/) comme base de données  
+- [Hibernate](https://hibernate.org/) comme ORM  
+
+---
+
+## Prérequis
+
+Avant d’installer et lancer le projet, assurez-vous d’avoir :  
+
+- [Node.js](https://nodejs.org/) (v18+)  
+- [npm](https://www.npmjs.com/) (gestionnaire de paquets frontend)  
+- [Java JDK 17+](https://adoptium.net/)  
+- [Maven](https://maven.apache.org/)  
+- [XAMPP](https://www.apachefriends.org/) (inclut MySQL)  
+- Git  
+
+---
+
+## Démarrage rapide
+
+Cloner le dépôt :
 
 ```bash
-git checkout feature/test-feature
-git pull origin main
+git clone https://github.com/your-org/taskflow.git
+cd taskflow
 ```
-
-
-lhistory dyal merges katb9a walakin momkin tkhrb9 lcommmit tree
-
-## Option 2: dir rebase l branch dyalk flmain
+### Lancer le Frontend (Next.js)
 
 ```bash
-git checkout feature/test-feature
-git pull --rebase origin main
+cd frontend
+npm install
+npm run dev
 ```
-lhistory katb9a n9iya mais ila kano des conflits khask tfkhom manuellement
+L’application sera accessible sur [http://localhost:3000](http://localhost:3000)
 
+## Liens de documentation
 
-# smyat  dyal lbranch (proposition dyali sinon  blach)
-bach lhistoorique ikon bayn w mfhom
+[Guide de développement Frontend](./Docs/FRONTEND_DEVELOPMENT.md)
+[Guide de développement Backend](./Docs/BACKEND_DEVELOPMENT.md)
 
-| Prefix  | lach sal7a      | mital     |
-| ----------- | ---------- | --------------- |
-| `feature/`| fonctionalité jdida  | `feature/login-api`  |
-| `bugfix/` | bug machi urgent  | `bugfix/input-erreur` |
-| `hotfix/` | bug urgent  | `hotfix/login-makhdamch`       |
-| `docs/` | changement 3la documentation | `docs/update-conception` |

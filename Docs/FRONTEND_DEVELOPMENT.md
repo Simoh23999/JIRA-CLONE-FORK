@@ -54,7 +54,8 @@ npm run format:check
 ```bash
 npm run pre-commit
 ```
->[!NOTE] cette commande n'est rien qu'une combinaison entre "format:check" et "lint"
+>[!NOTE] 
+cette commande n'est rien qu'une combinaison entre "format:check" et "lint"
 
 <br>
 
@@ -69,3 +70,27 @@ Vérifie les **vulnérabilités** et les paquets **obsolètes**(out dated) :
 ```bash
 npm run deps:check
 ```
+# Scripts Frontend
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Démarrer le serveur de développement avec Turbopack sur le port 3000 |
+| `npm run build` | Construire l'application pour la production |
+| `npm run start` | Démarrer le serveur de production |
+| `npm run lint` | Exécuter ESLint pour vérifier la qualité du code |
+| `npm run lint:fix` | Exécuter ESLint et corriger automatiquement les erreurs |
+| `npm run format` | Formater le code avec Prettier |
+| `npm run format:check` | Vérifier le formatage du code avec Prettier |
+| `npm run deps:check` | Vérifier les vulnérabilités de sécurité et les packages obsolètes |
+| `npm run pre-commit` | Exécuter les vérifications de linting et formatage (utilisé par Husky) |
+| `npm run prepare` | Configurer les hooks Git Husky |
+
+# Variables d'Environnement .env
+Créer le fichier .env dans le répertoire `frontend` :
+```bash
+cp .exemple.env .env
+```
+Ce fichier contient l'URL de base de l'API Backend
+NEXT_PUBLIC_BASE_URL=http://localhost:9090
+
+

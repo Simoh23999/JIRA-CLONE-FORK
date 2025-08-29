@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ReactQueryProvider } from "./ReactQueryProvider";
+import { OrganizationProvider } from "./context/OrganizationContext";
 
 
 const geistSans = Geist({
@@ -33,8 +34,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ReactQueryProvider>
+          <OrganizationProvider>
            <Toaster toastOptions={{ style: { color: '#f59e0b', borderRadius: '12px', padding: '16px' } }} />
           {children}
+          </OrganizationProvider>
         </ReactQueryProvider>
       </body>
     </html>

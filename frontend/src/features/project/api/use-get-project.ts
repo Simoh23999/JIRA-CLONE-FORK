@@ -32,7 +32,7 @@ export function useGetProjectById(projectid: number | string) {
   });
 }
 
-export function useGetProjects(workspaceId: number | string) {
+export function useGetProjects(workspaceId: string |number) {
   return useQuery<Project[], Error>({
     queryKey: ["projects", workspaceId],
     queryFn: async () => {

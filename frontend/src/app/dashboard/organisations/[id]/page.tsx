@@ -105,7 +105,7 @@ const filteredMembers = members?.filter((m) => m.role !== "OWNER") || [];
   return (
     <div className="container mx-auto px-4 py-3 md:px-6 max-w-4xl">
       {/* --- Banner Image --- */}
-      <div className="relative w-full h-48 mb-6 rounded-xl overflow-hidden shadow-sm">
+      <div className="">
         {workspace?.bannerUrl ? (
         <div className="relative w-full h-48 mb-6 rounded-xl overflow-hidden shadow-sm">
           <img

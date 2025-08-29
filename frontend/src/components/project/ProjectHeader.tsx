@@ -31,7 +31,7 @@ interface Props {
   progress: number;
   onEdit?: () => void;
   onDelete: (isopen:boolean,project:Project) => void;
-  onAddTask?: () => void;
+  onAddTask: () => void;
 }
 
 export const ProjectHeader = ({

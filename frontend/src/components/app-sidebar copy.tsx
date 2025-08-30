@@ -105,7 +105,20 @@ const data = {
     },
     { title: "Paramètres", url: "/settings", icon: Settings2, isActive: false },
   ],
-  projects: [{ name: "Clone Jira", url: "#", icon: Frame }],
+  projects: [
+    {
+      id: 1,
+      name: "Clone Jira",
+      description: "Projet de clonage de Jira",
+      organizationId: 1,
+      createdByMembershipId: 1,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z",
+      status: "active",
+      url: "#",
+      icon: Frame,
+    },
+  ],
 };
 
   return (

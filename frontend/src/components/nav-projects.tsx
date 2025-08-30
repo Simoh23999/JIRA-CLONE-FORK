@@ -94,71 +94,76 @@ export function NavProjects({
 
   return (
     <>
-      <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-        <SidebarGroupLabel>Projects</SidebarGroupLabel>
-        <SidebarMenu>
-          {projects.map((item) => (
-            <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton asChild>
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.name}</span>
-                </a>
-              </SidebarMenuButton>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction showOnHover>
-                    <MoreHorizontal />
-                    <span className="sr-only">More</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-48 rounded-lg"
-                  side={isMobile ? "bottom" : "right"}
-                  align={isMobile ? "end" : "start"}
-                >
-                  <Link href={`/dashboard/projects/${item.id}`}>
-                    <DropdownMenuItem>
-                      <Folder className="text-muted-foreground" />
-                      <span>View Project</span>
-                    </DropdownMenuItem>
-                  </Link>
-                  <DropdownMenuItem>
-                    <Share2 className="text-muted-foreground" />
-                    <span>Share Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      handleAddMemberProject(true, item);
-                    }}
-                  >
-                    <UserPlus className="text-muted-foreground" />
-                    <span>Invite Members</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => openDeleteDialog(true, item)}
-                  >
-                    <Trash2 className="text-muted-foreground" />
-                    <span>Delete Project</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          ))}
-          <SidebarMenuItem>
-            <SidebarMenuButton className="text-sidebar-foreground/70">
-              <MoreHorizontal className="text-sidebar-foreground/70" />
-              <span>More</span>
+    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+      <SidebarGroupLabel>Projects</SidebarGroupLabel>
+      {projects.length === 0 && (
+        <div className="p-4 text-sm text-gray-500 italic">
+          Aucun projet disponible
+        </div>)}  
+      <SidebarMenu>
+        {projects.map((item) => (
+          <SidebarMenuItem key={item.name}>
+            <SidebarMenuButton asChild>
+              <a href={item.url}>
+                 {/* <div className="relative flex size-6 items-center justify-center rounded-md border border-[#2563eb]/20 bg-gradient-to-br from-[#1e3a8a] to-[#0ea5e9] overflow-hidden"> */}
+                  <div className="relative flex size-6 items-center justify-center rounded-md border border-[#2563eb]/20 bg-[#0ea5e9] overflow-hidden">
+                  {/* Effet de brillance */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent"></div>
+                    <span className="font-semibold text-xs text-white relative z-10 drop-shadow-sm">
+                      {item.name.charAt(0).toUpperCase()}
+                    </span>
+                </div>
+                <span>{item.name}</span>
+              </a>
             </SidebarMenuButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuAction showOnHover>
+                  <MoreHorizontal />
+                  <span className="sr-only">More</span>
+                </SidebarMenuAction>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-48 rounded-lg"
+                side={isMobile ? "bottom" : "right"}
+                align={isMobile ? "end" : "start"}
+              >
+                <Link href={`/dashboard/projects/${item.id}`}>
+                <DropdownMenuItem>
+                  <Folder className="text-muted-foreground" />
+                  <span>Voir le projet</span>
+                </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem>
+                  <Share2 className="text-muted-foreground" />
+                  <span>Partager le projet</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={()=>{handleAddMemberProject(true,item)}}>
+                <UserPlus className="text-muted-foreground" />
+                  <span>Inviter des membres</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive" onClick={() => openDeleteDialog(true,item)}>
+                  <Trash2 className="text-muted-foreground" />
+                  <span>Supprimer le projet</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroup>
-
-      {/* formulaire de ajoute member projet */}
-      <ResponsiveModal open={openAdd} onOpenChange={setOpenAdd}>
-        <AddMemberProjectForm
+        ))}
+        {/* <SidebarMenuItem>
+          <SidebarMenuButton className="text-sidebar-foreground/70">
+            <MoreHorizontal className="text-sidebar-foreground/70" />
+            <span>More</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem> */}
+      </SidebarMenu>
+    </SidebarGroup>
+       
+       
+{/* formulaire de ajoute member projet */}
+   <ResponsiveModal open={openAdd} onOpenChange={setOpenAdd}>
+    <AddMemberProjectForm
           projectId={selectedProject?.id!}
           onCancel={() => setOpenAdd(false)}
           onSuccess={() => setOpenAdd(false)}

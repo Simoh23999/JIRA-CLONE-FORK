@@ -46,15 +46,13 @@ export default function ProjectPage() {
       <BackButton />
       {workspace && (
         <WorkspaceHeader
-          workspace={workspace}
-          members={memberORG as any}
-          onCreateProject={() => {
-            hanldleOpenProjectForm(true);
-          }}
-          onInviteMember={() => {
-            handleAddMember(true);
-          }}
-        />
+          workspace={workspace as any}
+          members={(memberORG || []).map(member => ({
+            ...member,
+            userId: typeof member.userId === 'string' ? parseInt(member.userId, 10) : member.userId
+          }))}
+          onCreateProject={()=>{hanldleOpenProjectForm(true)}}
+          onInviteMember={()=>{handleAddMember(true)} }        />
       )}
       {/* <Separator className="p-2"></Separator> */}
       {project ? (

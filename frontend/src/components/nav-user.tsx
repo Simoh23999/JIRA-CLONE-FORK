@@ -114,14 +114,14 @@ export function NavUser({
               <Link href="/dashboard/account">
                 <DropdownMenuItem>
                   <BadgeCheck className="mr-2 h-4 w-4" />
-                  Account
+                  Profile
                 </DropdownMenuItem>
               </Link>
 
               <Link href="/dashboard/settings">
                 <DropdownMenuItem>
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Settings
+                  Paramètres
                 </DropdownMenuItem>
               </Link>
 
@@ -137,7 +137,7 @@ export function NavUser({
             <DropdownMenuItem variant="destructive" onClick={logout}>
               <Link href="/auth" className="flex items-center">
                 <LogOut className="mr-2 h-4 w-4 text-red-500" />
-                Logout
+                Déconnexion
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

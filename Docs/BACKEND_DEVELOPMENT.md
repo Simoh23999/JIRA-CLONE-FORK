@@ -1,4 +1,4 @@
-# 🚀 Jira Clone - Backend API
+# 🚀 TaskFlow (Jira Clone) - Backend API
 
 Un système de gestion de projets complet inspiré de Jira, développé avec Spring Boot. Cette API REST fournit toutes les fonctionnalités nécessaires pour gérer des organisations, projets, sprints et tâches avec un système de rôles et permissions robuste.
 

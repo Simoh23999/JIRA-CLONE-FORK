@@ -40,4 +40,7 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ProjectMembership> projectMemberships = new ArrayList<>(); // List of memberships in the project
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Task> tasks = new ArrayList<>();
+
 }

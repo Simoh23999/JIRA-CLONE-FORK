@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -30,4 +32,14 @@ public class ProjectMembership {
     @Column(nullable = false)
     ProjectRole roleInProject; // Role in the project, e.g., "ADMIN", "MEMBER", etc.
     private LocalDateTime creationDate;
+
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
+    private List<Task> createdTasks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "assignedTo", cascade = CascadeType.ALL)
+    private List<Task> assignedTasks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "assignedBy", cascade = CascadeType.ALL)
+    private List<Task> assignedByTasks = new ArrayList<>();
+
 }

@@ -47,6 +47,7 @@ import { Toast } from "../../components/ui/Toast";
 import { JwtPayload } from "@/types/jwt";
 import { refreshToken } from "@/lib/refreshToken";
 import { jwtDecode } from "jwt-decode";
+import { queryClient } from "@/app/ReactQueryProvider";
 
 interface Sprint {
   id: string;
@@ -344,6 +345,7 @@ export default function SprintPage({
           },
         );
         //   console.log("raw response ",response);
+        console.log("====|> Sprints fetched:", response);
         console.log("response : ", response.data);
         const new_sprints =
           response.data.map((sprint: Sprint) => ({
@@ -409,6 +411,7 @@ export default function SprintPage({
           },
         },
       );
+      queryClient.invalidateQueries({ queryKey: ["sprints", "project", projectId] });
       setSprints((prevSprints) =>
         prevSprints.map((s) =>
           s.id === sprint.id ? { ...s, status: "Actif" as const } : s,

@@ -8,6 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class MembershipResponse {
     private Long userId;
+    private Long membershipId;
     private String fullName;
     private String email;
     private RoleInOrganization role;

@@ -21,9 +21,9 @@ export const ProjectTabs = () => {
         <TabsTrigger value="summary" icon={<Globe />}>
           Résumé
         </TabsTrigger>
-        <TabsTrigger value="backlog" icon={<List />}>
+        {/* <TabsTrigger value="backlog" icon={<List />}>
           Backlog
-        </TabsTrigger>
+        </TabsTrigger> */}
         <TabsTrigger value="Sprints" icon={<List />}>
           Sprints
         </TabsTrigger>

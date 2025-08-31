@@ -26,73 +26,73 @@ export function useAuthRole(members?: Member[]) {
   const [userId, setUserId] = useState<string | number | null>(null);
   const router = useRouter();
 
-  // useEffect(() => {
-  //   const token =
-  //     localStorage.getItem("token") || sessionStorage.getItem("token");
-  //   if (!token) {
-  //     router.push("/auth");
-  //     return;
-  //   }
-
-  //   if (token && members) {
-  //     try {
-  //       const decoded = jwtDecode<JwtPayload>(token);
-
-  //       if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-  //         console.warn("Token expiré");
-  //         localStorage.removeItem("token");
-  //         router.push("/auth");
-  //       } else {
-  //         const email = decoded.email;
-  //         const member = members.find((m) => m.email === email) || null;
-
-  //         if (member) {
-  //           setUserId(member.userId);
-  //           setIsMember(true);
-  //           if (member.role === "ADMIN" || member.role === "OWNER") {
-  //             setIsAdminOrOwner(true);
-  //           }
-  //         }
-  //       }
-  //     } catch (err) {
-  //       console.error("Erreur lors du décodage du token", err);
-  //       router.push("/auth");
-  //     }
-  //   }
-  // }, [members, router]);
-
   useEffect(() => {
-    async () => {
-      const storedToken =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (!token) {
+      router.push("/auth");
+      return;
+    }
 
-      let token = storedToken;
-      if (token) {
-        try {
-          const decoded = jwtDecode<JwtPayload>(token);
+    if (token && members) {
+      try {
+        const decoded = jwtDecode<JwtPayload>(token);
 
-          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-            token = await refreshToken();
+        if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+          console.warn("Token expiré");
+          localStorage.removeItem("token");
+          router.push("/auth");
+        } else {
+          const email = decoded.email;
+          const member = members.find((m) => m.email === email) || null;
+
+          if (member) {
+            setUserId(member.userId);
+            setIsMember(true);
+            if (member.role === "ADMIN" || member.role === "OWNER") {
+              setIsAdminOrOwner(true);
+            }
           }
-        } catch (error) {
-          console.error("Invalid token:", error);
-          token = await refreshToken();
         }
-      } else {
-        token = await refreshToken();
+      } catch (err) {
+        console.error("Erreur lors du décodage du token", err);
+        router.push("/auth");
       }
-      const newDecoded = jwtDecode<JwtPayload>(token!);
-      const email = newDecoded.email;
-      const member = members?.find((m) => m.email === email) || null;
-      if (member) {
-        setUserId(member.userId);
-        setIsMember(true);
-        if (member.role === "ADMIN" || member.role === "OWNER") {
-          setIsAdminOrOwner(true);
-        }
-      }
-    };
+    }
   }, [members, router]);
+
+  // useEffect(() => {
+  //   async () => {
+  //     const storedToken =
+  //       localStorage.getItem("token") || sessionStorage.getItem("token");
+
+  //     let token = storedToken;
+  //     if (token) {
+  //       try {
+  //         const decoded = jwtDecode<JwtPayload>(token);
+
+  //         if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+  //           token = await refreshToken();
+  //         }
+  //       } catch (error) {
+  //         console.error("Invalid token:", error);
+  //         token = await refreshToken();
+  //       }
+  //     } else {
+  //       token = await refreshToken();
+  //     }
+  //     const newDecoded = jwtDecode<JwtPayload>(token!);
+  //     const email = newDecoded.email;
+  //     const member = members?.find((m) => m.email === email) || null;
+  //     if (member) {
+  //       setUserId(member.userId);
+  //       setIsMember(true);
+  //       if (member.role === "ADMIN" || member.role === "OWNER") {
+  //         setIsAdminOrOwner(true);
+  //       }
+  //     }
+  //   };
+  // }, [members, router]);
 
   return { isAdminOrOwner, isMember, userId };
 }

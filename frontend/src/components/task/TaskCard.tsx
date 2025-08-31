@@ -66,11 +66,6 @@ export default function TaskCard({
           <CardTitle className="text-base font-semibold text-gray-800">
             {task.title}
           </CardTitle>
-          {task.description && (
-            <p className="text-sm text-gray-500 line-clamp-2 mt-1">
-              {task.description}
-            </p>
-          )}
         </div>
 
         {/* Menu ... */}
@@ -143,7 +138,7 @@ export default function TaskCard({
       </CardHeader>
 
       {/* Footer */}
-      <CardContent className="flex justify-between items-center px-3 pb-3 text-xs text-gray-600">
+      <CardContent className="flex justify-between items-center px-3 pb-1 text-xs text-gray-600">
         <div className="flex items-center gap-2">
           {assigendUser && assigendUser.length > 0 ? (
             assigendUser.map((member, index) => (

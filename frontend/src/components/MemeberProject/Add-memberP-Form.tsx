@@ -119,7 +119,7 @@ const AddMemberProjectForm = ({
                     console.log("m.membershipId",m.membershipId),
                     console.log("typeof m.membershipId",typeof m.membershipId),
                   
-                    <SelectItem key={m.userId} value={m.userId.toString()}>
+                    <SelectItem key={m.membershipId} value={m.membershipId.toString()}>
                       <div className="flex flex-col">
                         <span className="font-medium">{m.fullName}</span>
                         <span className="text-xs text-gray-500">{m.email}</span>

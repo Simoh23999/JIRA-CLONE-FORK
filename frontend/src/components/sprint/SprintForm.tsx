@@ -269,7 +269,7 @@ export const SprintForm: React.FC<SprintFormProps> = ({
               projectId: projectId,
               startDate: formData.startDate,
               endDate: formData.endDate,
-              status: sprint.status,
+              // status: sprint.status,
             },
             {
               headers: {

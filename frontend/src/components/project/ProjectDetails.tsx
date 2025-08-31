@@ -40,7 +40,6 @@ import {
   UserPlus,
 } from "lucide-react";
 import { DropdownMenuSeparator } from "@/app/ui/dropdown-menu";
-import { Trash2, User, UserCog, UserPlus, MoreVerticalIcon } from "lucide-react";
 import type { Project } from "@/types/project";
 import type { ProjectMember } from "@/types/PRojectMember";
 import { ResponsiveModal } from "../ResponsiveModal";
@@ -73,6 +72,9 @@ import CreateTaskForm from "../task/creat-task-form";
 import { AssignTaskForm } from "../task/assign-task-form";
 import { useDeleteTask } from "@/features/tasks/api/use-delete-task";
 import UpdateTaskForm from "../task/update-task-form";
+import { useGetTasksByTask } from "@/features/sprint/api/use-get-sprints";
+import { SprintTimeline } from "../sprint/sprintimeline";
+import { useGetSprintsByProjectId } from "@/features/sprint/api/use-get-sprints";
 
 interface Props {
   project: Project;
@@ -88,7 +90,9 @@ const ProjectDetails = ({ project, member }: Props) => {
   const updateMemberProjectRole = useUpdateMemberProjectRole();
   const { isProjectOwner, userProjectMembershipId } = useProjectAuthRole(project.id);
 
-  const { data: tasks } = useGetTasksByProject(project.id);
+  const { data: tasks } = useGetTasksByTask(project.id);
+  const { data: sprints, isLoading: sprintsLoading, error: sprintsError } = useGetSprintsByProjectId(project.id);
+  
   const [taskState, setTaskState] = useState<Task[]>([]);
   const deleteTaskMutation = useDeleteTask(project.id);
 
@@ -228,13 +232,13 @@ const ProjectDetails = ({ project, member }: Props) => {
           <ProjectSummary tasks={taskState} />
         </TabsContent>
 
-        <TabsContent value="backlog">
+        {/* <TabsContent value="backlog">
           <TaskColumn
             title="Sprint"
             onTaskClick={handleTaskClick}
             isFullWidth
           />
-        </TabsContent>
+        </TabsContent> */}
 
         <TabsContent value="Sprints">
           <SprintPage
@@ -279,7 +283,15 @@ const ProjectDetails = ({ project, member }: Props) => {
         </TabsContent>
 
         <TabsContent value="calendrier">
-          <p>Calendrier à venir...</p>
+          {sprintsLoading ? (
+            <div className="text-center text-muted-foreground py-8">Chargement du calendrier...</div>
+          ) : sprintsError ? (
+            <div className="text-center text-red-500 py-8">Erreur lors du chargement des sprints</div>
+          ) : sprints && sprints.length > 0 ? (
+            <SprintTimeline sprints={sprints} />
+          ) : (
+            <div className="text-center text-muted-foreground py-8">Aucun sprint trouvé pour ce projet.</div>
+          )}
         </TabsContent>
 
         <TabsContent value="member">
@@ -295,54 +307,73 @@ const ProjectDetails = ({ project, member }: Props) => {
             )}
           </div>
 
-          {member.map((m) => (
-            <Fragment key={m.membershipId}>
-              <div className="flex items-center gap-3 border p-3 rounded-lg shadow-sm">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={m.avatarUrl} />
-                  <AvatarFallback>{m.fullName?.[0] || "M"}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col">
-                  <p className="text-sm font-medium">{m.fullName}</p>
-                  <p className="text-muted-foreground text-xs">
-                    {m.roleInProject || "Membre"}
-                  </p>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {member.map((m) => (
+              <Fragment key={m.membershipId}>
+                <div
+                  className="flex items-center gap-4 bg-[#F4F5F7] border border-[#DEEBFF] p-4 rounded-xl shadow-sm transition hover:shadow-md hover:bg-[#E3F2FD]"
+                  style={{ minHeight: 80 }}
+                >
+                  <Avatar className="h-12 w-12 border-2 border-[#0052CC] shadow">
+                    <AvatarImage src={m.avatarUrl} />
+                    <AvatarFallback className="bg-[#DEEBFF] text-[#0052CC] font-bold">
+                      {m.fullName?.[0] || "M"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-base font-semibold text-[#172B4D]">{m.fullName}</p>
+                      {m.roleInProject === "PROJECT_OWNER" ? (
+                        <UserCog className="w-4 h-4 text-[#0052CC]">
+                          <title>Admin</title>
+                        </UserCog>
+                      ) : (
+                        <User className="w-4 h-4 text-[#36B37E]" >
+                        <title>Membre</title>
+                        </User>
 
-                {isProjectOwner && m.id != userProjectMembershipId && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button className="ml-auto" variant="secondary" size="icon">
-                        <MoreVerticalIcon className="size-4 text-muted-foreground" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="bottom" align="end">
-                      {m.roleInProject === "PROJECT_MEMBER" && (
-                        <DropdownMenuItem onClick={() => handleSetAsAdmin(m.id)}>
-                          <UserCog className="w-4 h-4 mr-2" />
-                          Définir comme Admin
-                        </DropdownMenuItem>
                       )}
-                      {m.roleInProject === "PROJECT_OWNER" && (
-                        <DropdownMenuItem onClick={() => handleSetAsMember(m.id)}>
-                          <User className="w-4 h-4 mr-2" />
-                          Définir comme Membre
+                    </div>
+                    <p className="text-xs font-medium text-[#5E6C84] mt-1">
+                      {m.roleInProject === "PROJECT_OWNER" ? "Admin du projet" : "Membre"}
+                    </p>
+                  </div>
+
+                  {isProjectOwner && m.id != userProjectMembershipId && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button className="ml-auto" variant="secondary" size="icon">
+                          <MoreVerticalIcon className="size-4 text-muted-foreground" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="bottom" align="end">
+                        {m.roleInProject === "PROJECT_MEMBER" && (
+                          <DropdownMenuItem onClick={() => handleSetAsAdmin(m.id)}>
+                            <UserCog className="w-4 h-4 mr-2" />
+                            Définir comme Admin
+                          </DropdownMenuItem>
+                        )}
+                        {m.roleInProject === "PROJECT_OWNER" && (
+                          <DropdownMenuItem onClick={() => handleSetAsMember(m.id)}>
+                            <User className="w-4 h-4 mr-2" />
+                            Définir comme Membre
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={() => openDeleteDialog(m.id)}
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                          Supprimer
                         </DropdownMenuItem>
-                      )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={() => openDeleteDialog(m.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                        Supprimer
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
-            </Fragment>
-          ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
+              </Fragment>
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
 

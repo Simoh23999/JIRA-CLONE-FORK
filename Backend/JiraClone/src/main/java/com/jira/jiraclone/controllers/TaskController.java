@@ -86,6 +86,19 @@ public class TaskController {
         List<TaskResponseDto> list = taskService.getTasksByProject(projectId, requester);
         return ResponseEntity.ok(list);
     }
+
+    // 5. Lister les tâches d'un projet
+    @GetMapping("/projects/{projectId}/sprintActif")
+    public ResponseEntity<List<TaskResponseDto>> getTasksByProjectSprintActif(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        User requester = userPrincipal.getUser();
+        List<TaskResponseDto> list = taskService.findBySprintStatusActif(projectId, requester);
+        return ResponseEntity.ok(list);
+    }
+
+
     // 6. Mettre à jour une tâche (PROJECT_OWNER uniquement)
     @PutMapping("/tasks/{taskId}")
     public ResponseEntity<TaskResponseDto> updateTask(

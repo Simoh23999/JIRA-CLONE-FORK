@@ -50,7 +50,9 @@ public class Sprint {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Task> tasks = new ArrayList<>();
+
 
 
     @PrePersist

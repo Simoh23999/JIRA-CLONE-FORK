@@ -18,6 +18,7 @@ public interface ITaskService {
     TaskResponseDto getTaskById(Long taskId, User requester);
 
     List<TaskResponseDto> getTasksByProject(Long projectId, User requester);
+    List<TaskResponseDto> findBySprintStatusActif(Long projectId, User requester);
 
     TaskResponseDto updateTask(Long taskId, TaskRequestDto dto, User requester);
 

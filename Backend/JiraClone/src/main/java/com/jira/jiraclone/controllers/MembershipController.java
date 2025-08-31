@@ -105,7 +105,7 @@ public class MembershipController {
         List<MembershipResponse> memberDTOs = memberships.stream().map(m -> {
             User user = m.getUser();
             return new MembershipResponse(
-//                    user.getId(),
+                    user.getId(),
                     m.getId(),
                     user.getUsername(),
                     user.getEmail(),

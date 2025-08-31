@@ -44,15 +44,17 @@ export default function OrganizationMembersList({
   isAdminOrOwner?: boolean;
 }) {
   const { data: members } = useGetOrganizationMembers(organizationId);
-  const { mutate: deleteMember, isLoading: isPending } =
+  const { mutate: deleteMember, isPending } =
     useDeleteMemberFromOrganization();
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+  const [selectedMemberId, setSelectedMemberId] = useState<string |number| null>(null);
 
   const filtered = members?.filter((m) => m.role !== "OWNER") || [];
 
-  const openDeleteDialog = (memberId: string) => {
+  console.log("---------------> Members List:", members);
+
+  const openDeleteDialog = (memberId: string|number) => {
     setSelectedMemberId(memberId);
     setDialogOpen(true);
   };
@@ -65,7 +67,7 @@ export default function OrganizationMembersList({
   };
   const updateMemberRole = useUpdateMemberRole();
   // Simulations des fonctions setAsAdmin/setAsMember
-  const handleSetAsAdmin = (memberId: string) => {
+  const handleSetAsAdmin = (memberId: string|number) => {
     updateMemberRole.mutate({
       organizationId: organizationId,
       targetUserId: memberId,

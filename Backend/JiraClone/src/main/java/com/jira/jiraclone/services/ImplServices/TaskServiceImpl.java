@@ -5,6 +5,7 @@ import com.jira.jiraclone.dtos.TaskRequestDto;
 import com.jira.jiraclone.dtos.TaskResponseDto;
 import com.jira.jiraclone.entities.*;
 import com.jira.jiraclone.entities.enums.ProjectRole;
+import com.jira.jiraclone.entities.enums.SprintStatus;
 import com.jira.jiraclone.entities.enums.TaskStatus;
 import com.jira.jiraclone.exceptions.NotFoundException;
 import com.jira.jiraclone.exceptions.UnauthorizedException;
@@ -303,5 +304,26 @@ public class TaskServiceImpl implements ITaskService {
         taskRepository.delete(task);
     }
 
+    @Override
+    public List<TaskResponseDto> findBySprintStatusActif(Long projectId, User requester) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new NotFoundException("Projet introuvable."));
+
+        List<Sprint> sprints=sprintRepository.findByProjectIdAndStatus(projectId, SprintStatus.ACTIVE);
+
+        if (sprints.isEmpty()) {
+            throw new NotFoundException("Aucun sprint actif trouvé pour ce projet.");
+        }
+
+        Membership m = membershipRepository.findByUserAndOrganization(requester, project.getOrganization())
+                .orElseThrow(() -> new UnauthorizedException("Vous n'êtes pas membre de l'organisation."));
+
+        projectMembershipRepository.findByProjectAndMembership(project, m)
+                .orElseThrow(() -> new UnauthorizedException("Vous n'êtes pas membre du projet."));
+
+        return taskRepository.findBySprintIn(sprints).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
 
 }

@@ -32,6 +32,7 @@ export function useUpdateTaskStatus() {
     onSuccess: (_, { taskId }) => {
       queryClient.invalidateQueries({ queryKey: ["tasks", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks", "project"] });
+      queryClient.invalidateQueries({ queryKey:  ["sprints", "project"] });
     },
   });
 }

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import z from "zod";
 import { createTaskSchema } from "../schemas"; 
+import { Value } from "@radix-ui/react-select";
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9090";
 
@@ -47,6 +48,7 @@ export function useUpdateTask() {
       queryClient.invalidateQueries({
         queryKey: ["task", variables.taskId],
       });
+      queryClient.invalidateQueries({ queryKey:  ["sprints", "project"] });
     },
   });
 }

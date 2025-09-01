@@ -25,7 +25,7 @@ const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9090";
 
 export function useGetTasksByTask(projectId: number | string) {
   return useQuery<Task[], Error>({
-    queryKey: ["sprints", "project", projectId],
+    queryKey: ["tasks", "project", projectId],      
     queryFn: async () => {
       try {
        const storedToken = 

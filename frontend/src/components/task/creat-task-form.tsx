@@ -19,7 +19,8 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { createTaskSchema } from "@/features/tasks/schemas";
 import { useCreateTask } from "@/features/tasks/api/use-create-task";
-import SprintSelect, { Sprint } from "./SprintSelect";
+import SprintSelect from "./SprintSelect";
+import { Sprint, useGetSprintsByProjectId } from "@/features/sprint/api/use-get-sprints";
 
 type CreateTaskFormData = z.infer<typeof createTaskSchema>;
 
@@ -32,7 +33,7 @@ const mockSprints: Sprint[] = [
   {
     id: "1",
     name: "Sprint 1 - Fondation",
-    status: "Actif",
+    status: "ACTIVE",
     startDate: "2024-01-15",
     endDate: "2024-01-29",
     progress: 65,
@@ -41,7 +42,7 @@ const mockSprints: Sprint[] = [
   {
     id: "2",
     name: "Sprint 2 - Fonctionnalités principales",
-    status: "Planification",
+    status : "PLANNED",
     startDate: "2024-01-30",
     endDate: "2024-02-13",
     progress: 0,
@@ -75,8 +76,20 @@ const CreateTaskForm = ({ projectId, onCancel }: Props) => {
     onCancel?.();
   };
 
-  const filteredSprints = mockSprints.filter(
-    (s) => s.status === "Actif" || s.status === "Planification"
+
+   // Utilisation du hook pour récupérer les sprints du projet
+    const { data: sprints, isLoading: sprintsLoading, error: sprintsError } =
+      useGetSprintsByProjectId(projectId);
+
+    // On vérifie que c'est bien un tableau
+    const sprintList: Sprint[] = Array.isArray(sprints) ? sprints : [];
+
+    const filteredSprints: Sprint[] = sprintList.filter(
+      (s) => s.status === "ACTIVE" || s.status === "PLANNED"
+    );
+
+  const filteredSprints1 = mockSprints.filter(
+    (s) => s.status === "ACTIVE" || s.status === "PLANNED"
   );
 
   return (

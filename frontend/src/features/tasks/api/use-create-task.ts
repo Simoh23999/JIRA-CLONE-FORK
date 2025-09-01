@@ -38,6 +38,7 @@ export function useCreateTask(projectId: number | string) {
       queryClient.invalidateQueries({ 
         queryKey: ["tasks", "project", projectId] 
       });
+      queryClient.invalidateQueries({ queryKey:  ["sprints", "project", projectId] });
     },
   });
 }

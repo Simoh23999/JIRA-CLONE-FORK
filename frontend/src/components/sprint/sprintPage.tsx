@@ -459,6 +459,8 @@ export default function SprintPage({
           s.id === sprint.id ? { ...s, status: "Terminé" as const } : s,
         ),
       );
+      queryClient.invalidateQueries({ queryKey:  ["sprints", "project", projectId] });
+      queryClient.invalidateQueries({ queryKey:  ["sprints", "project"] });
     } catch (error: any) {
       console.error("Erreur lors de la finalisation du sprint:", error);
       showToast("error", error.message);
@@ -501,6 +503,8 @@ export default function SprintPage({
           s.id === sprint.id ? { ...s, status: "Fermé" as const } : s,
         ),
       );
+      queryClient.invalidateQueries({ queryKey:  ["sprints", "project", projectId] });
+      queryClient.invalidateQueries({ queryKey:  ["sprints", "project"] });
     } catch (error: any) {
       console.error("Erreur lors de la fermeture du sprint:", error);
       showToast("error", error.message);

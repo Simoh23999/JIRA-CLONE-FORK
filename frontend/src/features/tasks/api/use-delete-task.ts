@@ -36,6 +36,7 @@ export function useDeleteTask(projectId: number | string) {
       queryClient.invalidateQueries({ 
         queryKey: ["tasks", "project", projectId] 
       });
+      queryClient.invalidateQueries({ queryKey:  ["sprints", "project", projectId] });
     },
     onError: (error: Error) => {
       toast.error(error.message);

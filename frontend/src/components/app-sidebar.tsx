@@ -24,11 +24,6 @@ import { useGetProjects } from "@/features/project/api/use-get-project";
 import { Organization } from "./organisation/types";
 import { Project } from "@/types/project";
 
-import { useAuth } from "@/app/context/UserContext";
-// import { useRouter } from "next/navigation";
-// import { usePathname } from "next/navigation";
-// import { useUser } from "@/app/context/UserContext";
-
 type JwtPayload = {
   email: string;
   exp: number;
@@ -45,46 +40,46 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const [isHovered, setIsHovered] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // const [user, setUser] = useState({
-  //   name: "Utilisateur",
-  //   email: "non défini",
-  //   avatar: "/avatars/avatar.jpg",
-  // });
+  const [user, setUser] = useState({
+    name: "Utilisateur",
+    email: "non défini",
+    avatar: "/avatars/avatar.jpg",
+  });
 
   // Organisation sélectionnée depuis le contexte
   const { organization, setOrganization } = useOrganization();
   const workspaceId = organization?.id || "87"; // valeur par défaut
 
   // Hook pour récupérer les projets de l'organisation
-  const { data: projects } = useGetProjects(workspaceId);
+  const { data: projects } = useGetProjects(workspaceId) as { data: Project[] | { projects: Project[] } | undefined };
 
   // Gestion du changement d'organisation
   const handleOrganizationChange = (org: Organization | null) => {
     setOrganization(org);
     console.log("Organisation sélectionnée :", org);
   };
-  const { user, isLoading } = useAuth();
-  // // Vérification du token et récupération des infos utilisateur
-  // useEffect(() => {
-  //   try {
-  //     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-  //     if (!token) return router.push("/auth");
 
-  //     const decoded = jwtDecode<JwtPayload>(token);
-  //     if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-  //       localStorage.removeItem("token");
-  //       router.push("/auth");
-  //     } else {
-  //       setUser((prev) => ({
-  //         ...prev,
-  //         username: decoded.username,
-  //         email: decoded.email,
-  //       }));
-  //     }
-  //   } catch (err) {
-  //     console.error("Erreur lors du décodage du token :", err);
-  //   }
-  // }, [router]);
+  // Vérification du token et récupération des infos utilisateur
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) return router.push("/auth");
+
+      const decoded = jwtDecode<JwtPayload>(token);
+      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        localStorage.removeItem("token");
+        router.push("/auth");
+      } else {
+        setUser((prev) => ({
+          ...prev,
+          username: decoded.username,
+          email: decoded.email,
+        }));
+      }
+    } catch (err) {
+      console.error("Erreur lors du décodage du token :", err);
+    }
+  }, [router]);
 
   // Lecture de la vidéo au hover
   useEffect(() => {
@@ -95,7 +90,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   }, [isHovered]);
 
   // Transformation des projets pour le sidebar
-  const sidebarProjects = (projects ?? []).map((p: Project) => ({
+  const projectList = Array.isArray(projects)
+    ? projects
+    : Array.isArray(projects?.projects)
+      ? projects.projects
+      : [];
+
+  const sidebarProjects = projectList.map((p: Project) => ({
     ...p,
     icon: Frame,
     url: `/dashboard/projects/${p.id}`,

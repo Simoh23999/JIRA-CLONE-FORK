@@ -298,7 +298,7 @@ export default function SprintPage({
 }: SprintPageProps) {
   const params = useParams();
   const { toast, showToast } = useToast();
-  const projectId = params.projectId as string;
+  const projectId = params.projectId as string || params.id as string;
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("date");

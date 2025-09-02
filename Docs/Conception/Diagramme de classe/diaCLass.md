@@ -1,1 +1,1 @@
-![alt text](<diaCLass.svg>)
+![alt text](<classDiagram.svg>)

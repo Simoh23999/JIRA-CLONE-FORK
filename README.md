@@ -36,7 +36,6 @@ Il permet aux équipes d’organiser les tâches, suivre l’avancement et gére
 - [Java](https://www.oracle.com/java/) (17+)  
 - [Spring Security](https://spring.io/projects/spring-security) pour la sécurité  
 - [MySQL](https://www.mysql.com/) via [XAMPP](https://www.apachefriends.org/) comme base de données  
-- [Hibernate](https://hibernate.org/) comme ORM  
 
 ---
 

@@ -108,7 +108,7 @@ Le projet suit une architecture en couches avec séparation claire des responsab
 
 1. **Cloner le repository**
 ```bash
-git clone https://github.com/Simoh23999/JIRA-CLONE.git
+git clone https://github.com/AH-Digital-go/DEVPFA-SQUAD-JIRA-CLONE.git
 cd JIRA-CLONE/Backend/JiraClone
 ```
 

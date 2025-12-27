@@ -5,6 +5,7 @@ pipeline {
 		stage('build'){
 			steps{
 				dir('frontend') {
+					echo "${pwd()}"
 					echo 'build frontend ...'
 					nodejs('node-25.2.1') {
 						echo 'npm install ..'

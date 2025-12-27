@@ -4,7 +4,22 @@ pipeline {
 	stages{
 		stage('build'){
 			steps{
-				echo 'build'
+				dir('frontend') {
+					echo 'build frontend ...'
+					nodejs('node-25.2.1') {
+						echo 'npm install ..'
+					  sh 'npm install'
+						echo 'run build'
+					  sh 'npm run build'
+					}
+
+
+				}
+				dir('Backend') {
+					echo 'build backend ...'
+					//sh 'mvn install'
+					//sh 'mvn build'
+				}
 			}
 
 		}

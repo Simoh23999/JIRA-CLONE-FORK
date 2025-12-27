@@ -1,9 +1,11 @@
-pipline {
+pipeline {
 	agent any
 
 	stages{
 		stage('build'){
-			echo 'build'
+			steps{
+				echo 'build'
+			}
 
 		}
 
